@@ -24,18 +24,12 @@ export function walk(node, visitor, state, parent) {
 	if (!state) state = {};
 
 	if (node.path === void 0) {
-		(function toPath() {
-			Object.defineProperty(node, 'path', {
-				enumerable: false,
-				writable: false,
-				value: {
+		node.path = {
 					parent: parent,
 					skip: () => (xx = 2),
 					remove: () => (xx = 0),
-					replace: (y) => toPath(node = y),
+			replace: (nxt) => (xx = nxt)
 				}
-			});
-		})();
 	}
 
 	if (block) {
@@ -48,10 +42,13 @@ export function walk(node, visitor, state, parent) {
 		if (xx !== 1) {
 			if (xx === 2) return node; // skip()
 			if (!xx) return; // remove() | replace(falsey)
+			xx.path = node.path; // replace(any)
+			node = xx;
 		}
 	}
 
 	for (key in node) {
+		if (key !== 'path') {
 		item = node[key];
 		if (item == null) continue;
 		if (typeof item !== 'object') continue;
@@ -60,11 +57,16 @@ export function walk(node, visitor, state, parent) {
 		else if (tmp === item) continue;
 		else node[key] = tmp;
 	}
+	}
 
 	if (block && block.exit) {
 		block.exit(node, state);
+		if (xx !== 1) {
 		// Now is too late to skip
 		if (!xx) return; // remove() | replace(falsey)
+			xx.path = node.path; // replace(any)
+			node = xx;
+		}
 	}
 
 	return node;
