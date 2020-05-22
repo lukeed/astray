@@ -1,0 +1,35 @@
+{
+  "name": "astray",
+  "version": "0.0.0",
+  "repository": "lukeed/astray",
+  "description": "Walk an AST without being led astray",
+  "unpkg": "dist/index.min.js",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "build": "bundt",
+    "pretest": "npm run build",
+    "test": "uvu -r esm test -i fixtures"
+  },
+  "files": [
+    "*.d.ts",
+    "dist"
+  ],
+  "keywords": [
+  ],
+  "devDependencies": {
+    "bundt": "1.0.1",
+    "esm": "3.2.25",
+    "uvu": "0.0.7"
+  }
+}
