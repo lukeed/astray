@@ -1,4 +1,4 @@
-export function walk(node, visitor, state = {}, parent = null) {
+export function walk(node, visitor, state, parent) {
 	if (!node) return;
 
 	if (typeof node !== 'object') {
@@ -6,6 +6,7 @@ export function walk(node, visitor, state = {}, parent = null) {
 	}
 
 	if (Array.isArray(node)) {
+		if (!state) state = {};
 		for (let tmp, item, i=0; i < node.length; i++) {
 			tmp = walk(item = node[i], visitor, state, parent);
 			if (!tmp) node.splice(i--, 1);
@@ -20,14 +21,13 @@ export function walk(node, visitor, state = {}, parent = null) {
 
 	let block = visitor[type];
 	let key, item, tmp, xx = 1;
+	if (!state) state = {};
 
 	if (node.path === void 0) {
 		Object.defineProperty(node, 'path', {
 			enumerable: false,
 			writable: false,
 			value: {
-				bindings: {},
-				scanned: false,
 				parent: parent,
 				skip: () => (xx = 2),
 				remove: () => (xx = 0),
