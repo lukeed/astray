@@ -3,6 +3,34 @@ import * as assert from 'uvu/assert';
 import { transform } from './fixtures';
 import * as utils from '../src/utils';
 
+const flat = suite('flat');
+
+flat('is a function', () => {
+	assert.type(utils.flat, 'function');
+});
+
+flat('should flatten child array into output', () => {
+	const output = [1, 2, 3];
+	utils.flat([3, 2, 1], output);
+	assert.equal(output, [1, 2, 3, 3, 2, 1]);
+});
+
+flat('should flatten nested child arrays into output', () => {
+	const output = [1, 2, 3];
+	utils.flat([3, [2, [1, [0]]]], output);
+	assert.equal(output, [1, 2, 3, 3, 2, 1, 0]);
+});
+
+flat('should ignore nullish child items', () => {
+	const output = [1, 2, 3];
+	utils.flat([null, [null, [undefined, []]]], output);
+	assert.equal(output, [1, 2, 3]);
+});
+
+flat.run();
+
+// ---
+
 const toIdentifier = suite('toIdentifier');
 
 toIdentifier('is a function', () => {
