@@ -33,7 +33,6 @@ export function walk(node, visitor, state, parent) {
 					skip: () => (xx = 2),
 					remove: () => (xx = 0),
 					replace: (y) => toPath(node = y),
-					traverse: (vv, ss) => walk(node, vv, ss, parent)
 				}
 			});
 		})();

@@ -4,21 +4,22 @@ type Nullable<T> = T | null;
 type Fallback = Record<string, any>;
 
 type NodeNames = keyof ESTree.Nodes;
+
 type Handler<N, S> = (node: Path<N>, state: S) => void;
+type Block<N, S> = {
+	enter?: Handler<N, S>;
+	exit?: Handler<N, S>;
+}
 
 export type Path<T> = T & {
 	parent: ESTree.Node | void;
 	skip(): void;
 	remove(): void;
 	replace(node: ESTree.Node): void;
-	traverse<S = Fallback>(visitor: Visitor<S>, state?: S): T;
 }
 
 export type Visitor<S> = {
-	[K in NodeNames]?: Handler<ESTree.Nodes[K], S> | {
-		enter?: Handler<ESTree.Nodes[K], S>;
-		exit?: Handler<ESTree.Nodes[K], S>;
-	}
+	[K in NodeNames]?: Handler<ESTree.Nodes[K], S> | Block<ESTree.Nodes[K], S>;
 }
 
 export function walk<T, S = Fallback>(node: T, visitor: Visitor<S>, state?: S, parent?: ESTree.Node): Path<T>;
