@@ -5,13 +5,12 @@ type Fallback = Record<string, any>;
 
 type NodeNames = keyof ESTree.Nodes;
 type Handler<N, S> = (node: Path<N>, state: S) => void;
-type Replacement = null | void | false | 0 | ESTree.Node;
 
 export type Path<T> = T & {
 	parent: ESTree.Node | void;
 	skip(): void;
 	remove(): void;
-	replace<X extends Replacement>(node: X): void;
+	replace(node: ESTree.Node): void;
 	traverse<S = Fallback>(visitor: Visitor<S>, state?: S): T;
 }
 

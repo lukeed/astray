@@ -24,17 +24,19 @@ export function walk(node, visitor, state, parent) {
 	if (!state) state = {};
 
 	if (node.path === void 0) {
-		Object.defineProperty(node, 'path', {
-			enumerable: false,
-			writable: false,
-			value: {
-				parent: parent,
-				skip: () => (xx = 2),
-				remove: () => (xx = 0),
-				replace: (y) => (xx = y),
-				traverse: (vv, ss) => walk(node, vv, ss, parent)
-			}
-		})
+		(function toPath() {
+			Object.defineProperty(node, 'path', {
+				enumerable: false,
+				writable: false,
+				value: {
+					parent: parent,
+					skip: () => (xx = 2),
+					remove: () => (xx = 0),
+					replace: (y) => toPath(node = y),
+					traverse: (vv, ss) => walk(node, vv, ss, parent)
+				}
+			});
+		})();
 	}
 
 	if (block) {
@@ -47,7 +49,6 @@ export function walk(node, visitor, state, parent) {
 		if (xx !== 1) {
 			if (xx === 2) return node; // skip()
 			if (!xx) return; // remove() | replace(falsey)
-			node = xx; // replace(any) (TODO: WRAP)
 		}
 	}
 
@@ -65,7 +66,6 @@ export function walk(node, visitor, state, parent) {
 		block.exit(node, state);
 		// Now is too late to skip
 		if (!xx) return; // remove() | replace(falsey)
-		else if (xx != 1 && xx != 2) node = xx; // replace(any) (TODO: WRAP)
 	}
 
 	return node;
