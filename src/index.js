@@ -32,7 +32,7 @@ export function walk(node, visitor, state, parent) {
 				skip: () => (xx = 2),
 				remove: () => (xx = 0),
 				replace: (y) => (xx = y),
-				traverse: walk.bind(0, node)
+				traverse: (vv, ss) => walk(node, vv, ss, parent)
 			}
 		})
 	}
