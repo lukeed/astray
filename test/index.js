@@ -1,6 +1,6 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { transform } from './fixtures';
+import { parse } from './fixtures';
 import * as astray from '../src';
 
 const walk = suite('walk');
@@ -11,7 +11,7 @@ walk('should be a function', () => {
 
 walk('should be able to visit base node', () => {
 	let seen = false;
-	const program = transform(`var hello = 'world';`, true);
+	const program = parse(`var hello = 'world';`);
 	const output = astray.walk(program, {
 		Program(node) {
 			assert.ok(node === program);
@@ -26,13 +26,13 @@ walk('should be able to visit base node', () => {
 
 walk('should traverse child nodes recursively', () => {
 	const seen = [];
-	const program = transform(`
+	const program = parse(`
 		const INFORMAL = true;
 		export function testing(props) {
 			let name = props.name || props.fullname;
 			return INFORMAL ? whaddup(name) : greet(name);
 		}
-	`, true);
+	`);
 
 	astray.walk(program, {
 		Identifier(node) {
@@ -49,12 +49,12 @@ walk('should traverse child nodes recursively', () => {
 });
 
 walk('should maintain `state` across visitor levels', () => {
-	const program = transform(`
+	const program = parse(`
 		export function hello(props) {
 			var name = props.name || 'world';
 			return 'Howdy, ' + name;
 		}
-	`, true);
+	`);
 
 	const seen = [];
 	astray.walk(program, {
@@ -79,12 +79,12 @@ walk('should maintain `state` across visitor levels', () => {
 
 walk('should accept initial `state` value', () => {
 	const state = { count: 0 };
-	const program = transform(`
+	const program = parse(`
 		export function hello(props) {
 			var name = props.name || 'world';
 			return 'Howdy, ' + name;
 		}
-	`, true);
+	`);
 
 	astray.walk(program, {
 		Identifier(n, s) {
@@ -98,11 +98,11 @@ walk('should accept initial `state` value', () => {
 
 walk('should support visitors with enter/exit methods', () => {
 	const state = { count: 0 };
-	const program = transform(`
+	const program = parse(`
 		function hello(props) {
 			return props.name || 'world';
 		}
-	`, true);
+	`);
 
 	astray.walk(program, {
 		Program: {
@@ -128,15 +128,15 @@ walk.run();
 
 // ---
 
-const path = suite('Path');
+const path = suite('Node.Path');
 
 path('should be attached to all Nodes', () => {
-	const program = transform(`
+	const program = parse(`
 		export function hello(props) {
 			var name = props.name || 'world';
 			return 'Howdy, ' + name;
 		}
-	`, true);
+	`);
 
 	let count = 0;
 	astray.walk(program, {
@@ -154,7 +154,7 @@ path('should be attached to all Nodes', () => {
 });
 
 path('should prevent child traversal via skip()', () => {
-	const program = transform(`
+	const program = parse(`
 		export function hello(props) {
 			if (props.disabled) {
 				var name = props.name || 'world';
@@ -162,7 +162,7 @@ path('should prevent child traversal via skip()', () => {
 				return verb + ' , ' + name;
 			}
 		}
-	`, true);
+	`);
 
 	let count = 0;
 

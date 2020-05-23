@@ -1,7 +1,9 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { transform } from './fixtures';
 import * as utils from '../src/utils';
+import { parse } from './fixtures';
+
+const transform = (str) => parse(str).body[0];
 
 const flat = suite('flat');
 

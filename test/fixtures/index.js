@@ -1,6 +1,5 @@
-import { parse } from 'meriyah';
+import { parse as p } from 'meriyah';
 
-export function transform(source, full) {
-	const AST = parse(source, { module: true, next: true });
-	return full ? AST : AST.body[0];
+export function parse(source) {
+	return p(source, { module: true, next: true });
 }
