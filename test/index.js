@@ -21,6 +21,7 @@ walk('should be able to visit base node', () => {
 	assert.is(output.type, 'Program', 'returns the base node');
 	assert.ok(output === program, 'returns original binding');
 	assert.ok(output.path, 'attaches "path" attribute');
+	assert.ok(seen, '~> visited itself');
 });
 
 walk('should traverse child nodes recursively', () => {
@@ -48,13 +49,3 @@ walk('should traverse child nodes recursively', () => {
 });
 
 walk.run();
-
-// ---
-
-const lookup = suite('lookup');
-
-lookup('should be a function', () => {
-	assert.type(astray.lookup, 'function');
-});
-
-lookup.run();
