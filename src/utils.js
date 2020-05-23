@@ -51,8 +51,5 @@ export function toIdentifier(node) {
 			}
 			return out;
 		}
-		default:
-			console.log('[TODO] Could not find identifier for "%s"', node.type, node);
-			break;
 	}
 }
