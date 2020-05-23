@@ -144,4 +144,9 @@ toIdentifier('VariableDeclaration :: function :: named', () => {
 	assert.equal(utils.toIdentifier(node), ['foo']);
 });
 
+toIdentifier('Unknown', () => {
+	const node = { type: 'foo', value: 'bar' };
+	assert.is(utils.toIdentifier(node), undefined);
+});
+
 toIdentifier.run();

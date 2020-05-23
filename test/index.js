@@ -9,6 +9,20 @@ walk('should be a function', () => {
 	assert.type(astray.walk, 'function');
 });
 
+walk('should be able to visit base node', () => {
+	let seen = false;
+	const program = transform(`var hello = 'world';`, true);
+	const output = astray.walk(program, {
+		Program(node) {
+			assert.ok(node === program);
+			seen = true;
+		}
+	});
+	assert.is(output.type, 'Program', 'returns the base node');
+	assert.ok(output === program, 'returns original binding');
+	assert.ok(output.path, 'attaches "path" attribute');
+});
+
 walk('should traverse child nodes recursively', () => {
 	const seen = [];
 	const program = transform(`
@@ -19,15 +33,11 @@ walk('should traverse child nodes recursively', () => {
 		}
 	`, true);
 
-	const output = astray.walk(program, {
+	astray.walk(program, {
 		Identifier(node) {
 			seen.push(node.name);
 		}
 	});
-
-	assert.is(output.type, 'Program', 'returns the base node');
-	assert.ok(output === program, 'returns original binding');
-	assert.ok(output.path, 'attaches "path" attribute');
 
 	assert.equal(seen, [
 		'INFORMAL',
@@ -39,3 +49,12 @@ walk('should traverse child nodes recursively', () => {
 
 walk.run();
 
+// ---
+
+const lookup = suite('lookup');
+
+lookup('should be a function', () => {
+	assert.type(astray.lookup, 'function');
+});
+
+lookup.run();
