@@ -48,4 +48,131 @@ walk('should traverse child nodes recursively', () => {
 	]);
 });
 
+walk('should maintain `state` across visitor levels', () => {
+	const program = transform(`
+		export function hello(props) {
+			var name = props.name || 'world';
+			return 'Howdy, ' + name;
+		}
+	`, true);
+
+	const seen = [];
+	astray.walk(program, {
+		FunctionDeclaration(node, state) {
+			state.parent = 'hello';
+			seen.push('function');
+		},
+		VariableDeclaration(node, state) {
+			assert.is(state.parent, 'hello');
+			state.variable = 'name';
+			seen.push('variable');
+		},
+		ReturnStatement(node, state) {
+			assert.is(state.parent, 'hello');
+			assert.is(state.variable, 'name');
+			seen.push('return');
+		}
+	});
+
+	assert.equal(seen, ['function', 'variable', 'return']);
+});
+
+walk('should accept initial `state` value', () => {
+	const state = { count: 0 };
+	const program = transform(`
+		export function hello(props) {
+			var name = props.name || 'world';
+			return 'Howdy, ' + name;
+		}
+	`, true);
+
+	astray.walk(program, {
+		Identifier(n, s) {
+			assert.is(s, state);
+			s.count++;
+		}
+	}, state);
+
+	assert.is(state.count, 6);
+});
+
+walk('should support visitors with enter/exit methods', () => {
+	const state = { count: 0 };
+	const program = transform(`
+		function hello(props) {
+			return props.name || 'world';
+		}
+	`, true);
+
+	astray.walk(program, {
+		Program: {
+			enter(n, s) {
+				assert.is(s, state);
+				assert.is(s.count, 0);
+			},
+			exit(n, s) {
+				assert.is(s, state);
+				assert.is(s.count, 4);
+			}
+		},
+		Identifier(n, s) {
+			assert.is(s, state);
+			s.count++;
+		}
+	}, state);
+
+	assert.is(state.count, 4);
+});
+
 walk.run();
+
+// ---
+
+const path = suite('Path');
+
+path('should be attached to all Nodes', () => {
+	const program = transform(`
+		export function hello(props) {
+			var name = props.name || 'world';
+			return 'Howdy, ' + name;
+		}
+	`, true);
+
+	let count = 0;
+	astray.walk(program, {
+		Identifier(node) {
+			count++; // just to make sure
+			assert.ok(typeof node.path === 'object');
+			assert.ok(typeof node.path.parent === 'object');
+			assert.ok(typeof node.path.replace === 'function');
+			assert.ok(typeof node.path.remove === 'function');
+			assert.ok(typeof node.path.skip === 'function');
+		}
+	});
+
+	assert.is(count, 6);
+});
+
+path('should prevent child traversal via skip()', () => {
+	const program = transform(`
+		export function hello(props) {
+			var name = props.name || 'world';
+			return 'Howdy, ' + name;
+		}
+	`, true);
+
+	let count = 0;
+
+	astray.walk(program, {
+		Identifier: {
+			enter(node) {
+				node.path.skip();
+				count++;
+			}
+		}
+	});
+
+	assert.is(count, 1);
+});
+
+path.run();
