@@ -24,6 +24,9 @@ export type Visitor<S> = {
 
 export function walk<T, S = Fallback>(node: T, visitor: Visitor<S>, state?: S, parent?: ESTree.Node): Path<T>;
 
+export function lookup<T = ESTree.Node>(node: T): Record<string, ESTree.Node>;
+export function lookup<T = ESTree.Node>(node: T, target: string): Record<string, ESTree.Node>;
+
 export namespace ESTree {
 	export type Node = AST.Node;
 

@@ -1,3 +1,5 @@
+import { toIdentifier } from './utils';
+
 export function walk(node, visitor, state, parent) {
 	if (!node) return;
 
@@ -26,6 +28,8 @@ export function walk(node, visitor, state, parent) {
 	if (node.path === void 0) {
 		node.path = {
 					parent: parent,
+			// scanned: false,
+			// bindings: {},
 					skip: () => (xx = 2),
 					remove: () => (xx = 0),
 			replace: (nxt) => (xx = nxt)
@@ -70,4 +74,64 @@ export function walk(node, visitor, state, parent) {
 	}
 
 	return node;
+}
+
+export function lookup(baseNode, target) {
+	let parent = baseNode;
+	let output = {}; // TODO: need to assign to each parent
+
+	while (parent = parent.path.parent) {
+		// TODO: incomplete types list
+		if (parent.path.scanned) { // TODO: setter
+			for (let k in parent.path.bindings) {
+				if (!output[k]) output[k] = parent.path.bindings[k];
+			}
+		} else if (parent.type === 'BlockStatement') {
+			let arr = parent.body;
+
+			// should not happen?
+			if (!arr.length) continue;
+
+			walk(arr, {
+				FunctionDeclaration(fnode) {
+					console.log('[FOUND][INNER] FunctionDeclaration: ', fnode);
+				},
+				VariableDeclarator(vnode) {
+					if (vnode.id.type === 'Identifier') {
+						output[vnode.id.name] = vnode;
+					} else {
+						console.log('[TODO] Non-Identifier Variable:', vnode.type, vnode);
+					}
+				},
+			});
+		} else if (parent.type === 'FunctionDeclaration') {
+			let tmp = toIdentifier(parent);
+			if (tmp && !output[tmp]) output[tmp] = parent;
+
+			// TODO: point to parent ref?
+			parent.params.forEach(obj => {
+				if (tmp = toIdentifier(obj)) {
+					if (!output[tmp]) output[tmp] = obj;
+				}
+			});
+		} else if (parent.type === 'Program') {
+			let i=0, tmp, arr=parent.body;
+			for (; i < arr.length; i++) {
+				if (tmp = toIdentifier(arr[i])) {
+					[].concat(tmp).forEach(str => {
+						if (output[str]) return;
+						output[str] = arr[i];
+					});
+				}
+			}
+		}
+
+		// TODO: Assign THIS LOOP'S scopes to this parent
+		// parent.path.scanned = true;
+
+		// Stop early if found the given target
+		if (target && output[target]) return output;
+	}
+
+	return output;
 }

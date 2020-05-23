@@ -176,3 +176,13 @@ path('should prevent child traversal via skip()', () => {
 });
 
 path.run();
+
+// ---
+
+const lookup = suite('lookup');
+
+lookup('should be a function', () => {
+	assert.type(astray.lookup, 'function');
+});
+
+lookup.run();
