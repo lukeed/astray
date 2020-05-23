@@ -156,23 +156,27 @@ path('should be attached to all Nodes', () => {
 path('should prevent child traversal via skip()', () => {
 	const program = transform(`
 		export function hello(props) {
-			var name = props.name || 'world';
-			return 'Howdy, ' + name;
+			if (props.disabled) {
+				var name = props.name || 'world';
+				var verb = props.informal ? 'Yo' : 'Hello';
+				return verb + ' , ' + name;
+			}
 		}
 	`, true);
 
 	let count = 0;
 
 	astray.walk(program, {
-		Identifier: {
-			enter(node) {
-				node.path.skip();
-				count++;
-			}
+		IfStatement(node) {
+			node.path.skip();
+		},
+		Identifier(node) {
+			count++;
 		}
 	});
 
-	assert.is(count, 1);
+	// would be 12 without skip
+	assert.is(count, 2);
 });
 
 path.run();
