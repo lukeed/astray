@@ -27,14 +27,18 @@ export function walk(node, visitor, state, parent) {
 
 	if (node.path === void 0) {
 		node.path = {
-					parent: parent,
+			parent: parent,
 			// scanned: false,
 			// bindings: {},
-					skip: () => (xx = 2),
-					remove: () => (xx = 0),
+			skip: () => (xx = 2),
+			remove: () => (xx = 0),
 			replace: (nxt) => (xx = nxt)
-				}
+		}
 	}
+	// need this?
+	// else if (!parent) {
+	// 	parent = node.path.parent;
+	// }
 
 	if (block) {
 		if (typeof block === 'function') {
@@ -53,21 +57,21 @@ export function walk(node, visitor, state, parent) {
 
 	for (key in node) {
 		if (key !== 'path') {
-		item = node[key];
-		if (item == null) continue;
-		if (typeof item !== 'object') continue;
-		tmp = walk(item, visitor, state, node);
-		if (tmp === void 0) delete node[key];
-		else if (tmp === item) continue;
-		else node[key] = tmp;
-	}
+			item = node[key];
+			if (item == null) continue;
+			if (typeof item !== 'object') continue;
+			tmp = walk(item, visitor, state, node);
+			if (tmp === void 0) delete node[key];
+			else if (tmp === item) continue;
+			else node[key] = tmp;
+		}
 	}
 
 	if (block && block.exit) {
 		block.exit(node, state);
 		if (xx !== 1) {
-		// Now is too late to skip
-		if (!xx) return; // remove() | replace(falsey)
+			// Now is too late to skip
+			if (!xx) return; // remove() | replace(falsey)
 			xx.path = node.path; // replace(any)
 			node = xx;
 		}

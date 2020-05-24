@@ -179,6 +179,25 @@ path('should prevent child traversal via skip()', () => {
 	assert.is(count, 2);
 });
 
+path('should remove Node on remove()', () => {
+	const program = parse(`
+		let name = 'lukeed';
+		if (HUMANIZE) name = 'Luke';
+		console.log('Hello', name);
+	`);
+
+	const count = program.body.length;
+	assert.is(count, 3, 'initial nodes');
+
+	astray.walk(program, {
+		IfStatement(node) {
+			node.path.remove();
+		},
+	});
+
+	assert.is(program.body.length, 2, 'updated nodes');
+});
+
 path.run();
 
 // ---
