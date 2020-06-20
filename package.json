@@ -30,6 +30,9 @@
     "dist"
   ],
   "keywords": [],
+  "optionalDependencies": {
+    "@types/estree": "^0.0.44"
+  },
   "devDependencies": {
     "@types/estree": "0.0.44",
     "bundt": "1.0.1",
