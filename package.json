@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "bundt",
-    "pretest": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "uvu -r esm test -i fixtures"
   },
   "files": [
@@ -34,10 +34,10 @@
     "@types/estree": "^0.0.44"
   },
   "devDependencies": {
-    "@types/estree": "0.0.44",
+    "@types/estree": "^0.0.44",
     "bundt": "1.0.1",
     "esm": "3.2.25",
     "meriyah": "1.9.15",
-    "uvu": "0.0.11"
+    "uvu": "0.0.16"
   }
 }

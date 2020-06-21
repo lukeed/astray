@@ -142,11 +142,11 @@ path('should be attached to all Nodes', () => {
 	astray.walk(program, {
 		Identifier(node) {
 			count++; // just to make sure
-			assert.ok(typeof node.path === 'object');
-			assert.ok(typeof node.path.parent === 'object');
-			assert.ok(typeof node.path.replace === 'function');
-			assert.ok(typeof node.path.remove === 'function');
-			assert.ok(typeof node.path.skip === 'function');
+			assert.type(node.path, 'object');
+			assert.type(node.path.parent, 'object');
+			assert.type(node.path.replace, 'function');
+			assert.type(node.path.remove, 'function');
+			assert.type(node.path.skip, 'function');
 		}
 	});
 
