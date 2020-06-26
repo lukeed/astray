@@ -69,8 +69,8 @@ export function walk(node, visitor, state, parent) {
 
 	if (block && block.exit) {
 		block.exit(node, state);
-		if (xx !== 1) {
 			// Now is too late to skip
+		if (xx !== 1 && xx !== 2) {
 			if (!xx) return; // remove() | replace(falsey)
 			xx.path = node.path; // replace(any)
 			node = xx;
