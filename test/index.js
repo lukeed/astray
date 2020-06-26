@@ -1,3 +1,4 @@
+import klona from 'klona';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import { parse } from './fixtures';
@@ -7,6 +8,10 @@ const walk = suite('walk');
 
 walk('should be a function', () => {
 	assert.type(astray.walk, 'function');
+});
+
+walk('should return non-objects immediately', () => {
+	assert.is(astray.walk(123), 123);
 });
 
 walk('should be able to visit base node', () => {
@@ -124,6 +129,20 @@ walk('should support visitors with enter/exit methods', () => {
 	assert.is(state.count, 4);
 });
 
+walk('should update Node item after visitor mutations', () => {
+	const program = parse(`export var foo = '123';`);
+	const copy = klona(program);
+
+	astray.walk(program, {
+		VariableDeclarator(node) {
+			node.init.value = 'bar';
+		}
+	});
+
+	assert.equal(program, program);
+	assert.not.equal(program, copy);
+});
+
 walk.run();
 
 // ---
@@ -179,7 +198,13 @@ path('should prevent child traversal via skip()', () => {
 	assert.is(count, 2);
 });
 
-path('should remove Node on remove()', () => {
+path.run();
+
+// ---
+
+const remove = suite('Node.Path.remove()');
+
+remove('should remove Node on remove()', () => {
 	const program = parse(`
 		let name = 'lukeed';
 		if (HUMANIZE) name = 'Luke';
@@ -198,7 +223,266 @@ path('should remove Node on remove()', () => {
 	assert.is(program.body.length, 2, 'updated nodes');
 });
 
-path.run();
+remove.run();
+
+// ---
+
+const skip = suite('Node.Path.skip()')
+
+skip('should skip Node children :: block', () => {
+	const program = parse(`
+		let foo = 'lukeed';
+		if (bar) baz = 'Luke';
+	`);
+
+	let count = 0;
+	let idents = [];
+
+	astray.walk(program, {
+		Identifier(node) {
+			count++;
+			idents.push(node.name);
+		},
+		IfStatement(node) {
+			node.path.skip();
+		},
+	});
+
+	assert.is(count, 1);
+	assert.equal(idents, ['foo']);
+});
+
+skip('should skip Node children :: enter', () => {
+	const program = parse(`
+		let foo = 'lukeed';
+		if (bar) baz = 'Luke';
+	`);
+
+	let count = 0;
+	let idents = [];
+
+	astray.walk(program, {
+		Identifier(node) {
+			count++;
+			idents.push(node.name);
+		},
+		IfStatement: {
+			enter(node) {
+				node.path.skip();
+			},
+		}
+	});
+
+	assert.is(count, 1);
+	assert.equal(idents, ['foo']);
+});
+
+skip('should skip Node children :: exit', () => {
+	const program = parse(`
+		let foo = 'lukeed';
+		if (bar) baz = 'Luke';
+	`);
+
+	let count = 0;
+	let idents = [];
+
+	astray.walk(program, {
+		Identifier(node) {
+			count++;
+			idents.push(node.name);
+		},
+		IfStatement: {
+			exit(node) {
+				node.path.skip();
+			},
+		}
+	});
+
+	// skip() on exit is too late
+	assert.is(count, 3);
+	assert.equal(idents, ['foo', 'bar', 'baz']);
+});
+
+skip.run();
+
+// ---
+
+const replace = suite('Node.Path.replace()');
+
+replace('should replace Node w/ new content :: block', () => {
+	const program = parse(`
+		export const foo = 'bar';
+	`);
+
+	const next = parse(`
+		var hello = 'world';
+	`);
+
+	astray.walk(program, {
+		VariableDeclaration(node) {
+			node.path.replace(next.body[0])
+		}
+	});
+
+	let updated = false;
+	astray.walk(program, {
+		Identifier(node) {
+			if (node.name === 'hello') {
+				updated = true;
+			}
+		}
+	});
+
+	assert.ok(updated);
+});
+
+replace('should replace Node w/ new content :: enter', () => {
+	const program = parse(`
+		export const foo = 'bar';
+	`);
+
+	const next = parse(`
+		var hello = 'world';
+	`);
+
+	astray.walk(program, {
+		VariableDeclaration: {
+			enter(node) {
+				node.path.replace(next.body[0])
+			}
+		}
+	});
+
+	let updated = false;
+	astray.walk(program, {
+		Identifier(node) {
+			if (node.name === 'hello') {
+				updated = true;
+			}
+		}
+	});
+
+	assert.ok(updated);
+});
+
+replace('should replace Node w/ new content :: exit', () => {
+	const program = parse(`
+		export const foo = 'bar';
+	`);
+
+	const next = parse(`
+		var hello = 'world';
+	`);
+
+	astray.walk(program, {
+		VariableDeclaration: {
+			exit(node) {
+				node.path.replace(next.body[0])
+			}
+		}
+	});
+
+	let updated = false;
+	astray.walk(program, {
+		Identifier(node) {
+			if (node.name === 'hello') {
+				updated = true;
+			}
+		}
+	});
+
+	assert.ok(updated);
+});
+
+replace('should remove Node w/ falsey content', () => {
+	const program = parse(`
+		var a=1, b=2, c=3, d=4;
+	`);
+
+	let count = 0
+	astray.walk(program, {
+		Identifier(node) {
+			count++;
+			switch (node.name) {
+				case 'a': node.path.replace(null);
+				case 'b': node.path.replace(undefined);
+				case 'c': node.path.replace(false);
+				case 'd': node.path.replace(0);
+			}
+		},
+	});
+
+	assert.is(count, 4);
+
+	let check = 0;
+	astray.walk(program, {
+		Identifier() {
+			check++;
+		},
+	});
+
+	assert.is(check, 0);
+});
+
+replace('should replace Node before child traversal :: block', () => {
+	const program = parse(`
+		var foo = 123;
+		var bar = { aaa: foo };
+	`);
+
+	let seen = [];
+	astray.walk(program, {
+		Identifier(node) {
+			seen.push(node.name);
+		},
+		ObjectExpression(node) {
+			node.path.replace({
+				type: 'Literal',
+				value: '123'
+			});
+		}
+	});
+
+	assert.is(seen.length, 2, 'after: 2 identifiers');
+	assert.equal(seen, ['foo', 'bar']);
+});
+
+// TODO: fails
+replace.skip('should replace Node before child traversal :: repeat run', () => {
+	const program = parse(`
+		var foo = 123; // +1
+		var bar = {    // +1
+			aaa: foo     // +2
+		};
+	`);
+
+	let count = 0;
+	astray.walk(program, {
+		Identifier() {
+			count++;
+		}
+	});
+
+	assert.is(count, 4, 'initial: 4 identifiers');
+
+	let seen = [];
+	astray.walk(program, {
+		Identifier(node) {
+			seen.push(node.name);
+		},
+		ObjectExpression(node) {
+			node.path.replace({
+				type: 'Literal',
+				value: '123'
+			});
+		}
+	});
+
+	assert.is(seen.length, 2, 'after: 2 identifiers');
+	assert.equal(seen, ['foo', 'bar']);
+});
+
+replace.run();
 
 // ---
 
