@@ -1,7 +1,7 @@
 import klona from 'klona';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { parse } from './fixtures';
+import { parse } from './helpers';
 import * as astray from '../src';
 
 const walk = suite('walk');

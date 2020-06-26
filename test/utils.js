@@ -1,7 +1,7 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import * as utils from '../src/utils';
-import { parse } from './fixtures';
+import { parse } from './helpers';
 
 const transform = (str) => parse(str).body[0];
 

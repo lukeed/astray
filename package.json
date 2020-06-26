@@ -23,7 +23,7 @@
   "scripts": {
     "build": "node build",
     "prepublishOnly": "npm run build",
-    "test": "uvu -r esm test -i fixtures"
+    "test": "uvu -r esm test -i helpers"
   },
   "files": [
     "*.d.ts",
