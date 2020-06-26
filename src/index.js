@@ -1,5 +1,8 @@
 import { toIdentifier } from './utils';
 
+export const SKIP = true;
+export const REMOVE = false;
+
 export function walk(node, visitor, state, parent) {
 	if (!node) return;
 
@@ -8,12 +11,13 @@ export function walk(node, visitor, state, parent) {
 	}
 
 	if (Array.isArray(node)) {
-		if (!state) state = {};
+		// if (!state) state = {};
 		for (let tmp, item, i=0; i < node.length; i++) {
 			tmp = walk(item = node[i], visitor, state, parent);
-			if (!tmp) node.splice(i--, 1);
-			else if (tmp === item) continue;
-			else node[i] = tmp; // else if tmp.node?
+			if (tmp === false) node.splice(i--, 1);
+			else if (tmp && tmp !== item) node[i] = tmp;
+			// else if (tmp === item) continue;
+			// else node[i] = tmp; // else if tmp.node?
 		}
 		return node;
 	}
@@ -21,19 +25,14 @@ export function walk(node, visitor, state, parent) {
 	let type = node.type;
 	if (!type) return node;
 
+	let key, item, xyz;
 	let block = visitor[type];
-	let key, item, tmp, xx = 1;
-	if (!state) state = {};
+	// if (!state) state = {};
 
 	if (node.path === void 0) {
-		node.path = {
-			parent: parent,
-			// scanned: false,
-			// bindings: {},
-			skip: () => (xx = 2),
-			remove: () => (xx = 0),
-			replace: (nxt) => (xx = nxt)
-		}
+		// scanned: false,
+		// bindings: {},
+		node.path = { parent };
 	}
 	// need this?
 	// else if (!parent) {
@@ -42,16 +41,18 @@ export function walk(node, visitor, state, parent) {
 
 	if (block) {
 		if (typeof block === 'function') {
-			block(node, state);
+			xyz = block(node, state);
 		} else if (block.enter) {
-			block.enter(node, state);
+			xyz = block.enter(node, state);
 		}
 
-		if (xx !== 1) {
-			if (xx === 2) return node; // skip()
-			if (!xx) return; // remove() | replace(falsey)
-			xx.path = node.path; // replace(any)
-			node = xx;
+		if (xyz === SKIP) {
+			return node; // skip traverse
+		} else if (xyz === REMOVE) {
+			return REMOVE;
+		} else if (xyz) {
+			xyz.path = node.path;
+			node = xyz;
 		}
 	}
 
@@ -60,20 +61,23 @@ export function walk(node, visitor, state, parent) {
 			item = node[key];
 			if (item == null) continue;
 			if (typeof item !== 'object') continue;
-			tmp = walk(item, visitor, state, node);
-			if (tmp === void 0) delete node[key];
-			else if (tmp === item) continue;
-			else node[key] = tmp;
+
+			xyz = walk(item, visitor, state, node);
+			if (xyz === REMOVE) delete node[key];
+			else if (xyz && xyz !== item) node[key] = xyz;
 		}
 	}
 
 	if (block && block.exit) {
-		block.exit(node, state);
-			// Now is too late to skip
-		if (xx !== 1 && xx !== 2) {
-			if (!xx) return; // remove() | replace(falsey)
-			xx.path = node.path; // replace(any)
-			node = xx;
+		xyz = block.exit(node, state);
+
+		if (xyz === SKIP) {
+			// too late to skip
+		} else if (xyz === REMOVE) {
+			return REMOVE;
+		} else if (xyz) {
+			xyz.path = node.path;
+			node = xyz;
 		}
 	}
 

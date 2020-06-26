@@ -1,11 +1,9 @@
 import * as AST from 'estree';
 
-type Nullable<T> = T | null;
-type Fallback = Record<string, any>;
-
+type Fallback = void;
 type NodeNames = keyof ESTree.Nodes;
 
-type Handler<N, S> = (node: Path<N>, state: S) => void;
+type Handler<N, S> = (node: Path<N>, state: S) => ESTree.Node | boolean | void;
 type Block<N, S> = {
 	enter?: Handler<N, S>;
 	exit?: Handler<N, S>;
@@ -13,14 +11,14 @@ type Block<N, S> = {
 
 export type Path<T> = T & {
 	parent: ESTree.Node | void;
-	skip(): void;
-	remove(): void;
-	replace(node: ESTree.Node): void;
 }
 
 export type Visitor<S> = {
 	[K in NodeNames]?: Handler<ESTree.Nodes[K], S> | Block<ESTree.Nodes[K], S>;
 }
+
+export const SKIP = boolean;
+export const REMOVE = boolean;
 
 export function walk<T, S = Fallback>(node: T, visitor: Visitor<S>, state?: S, parent?: ESTree.Node): Path<T>;
 
