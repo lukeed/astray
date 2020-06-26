@@ -21,7 +21,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "build": "bundt",
+    "build": "node build",
     "prepublishOnly": "npm run build",
     "test": "uvu -r esm test -i fixtures"
   },
