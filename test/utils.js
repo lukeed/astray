@@ -146,6 +146,31 @@ toIdentifier('VariableDeclaration :: function :: named', () => {
 	assert.equal(utils.toIdentifier(node), ['foo']);
 });
 
+
+toIdentifier('FunctionDeclaration', () => {
+	const node = transform(`function foo () {}`);
+	assert.equal(utils.toIdentifier(node), 'foo');
+});
+
+toIdentifier('VariableDeclarator', () => {
+	/** @type import('estree').VariableDeclaration */
+	// @ts-ignore
+	const { declarations } = transform(`var foo = 123`);
+	assert.equal(utils.toIdentifier(declarations[0]), 'foo');
+});
+
+
+toIdentifier('ObjectPattern :: simple', () => {
+	const node = transform(`let { foo, bar } = foobar();`);
+	assert.equal(utils.toIdentifier(node), ['foo', 'bar']);
+});
+
+toIdentifier('ObjectPattern :: nested', () => {
+	const node = transform(`let { foo: { bar } } = foobar();`);
+	assert.equal(utils.toIdentifier(node), ['bar']);
+});
+
+
 toIdentifier('Unknown', () => {
 	const node = { type: 'foo', value: 'bar' };
 	assert.is(utils.toIdentifier(node), undefined);

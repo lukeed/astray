@@ -20,6 +20,13 @@ export function toIdentifier(node) {
 	switch (node.type) {
 		case 'Identifier':
 			return node.name;
+		case 'ImportSpecifier':
+		case 'ImportDefaultSpecifier':
+		case 'ImportNamespaceSpecifier':
+			return toIdentifier(node.local);
+		case 'VariableDeclarator':
+		case 'FunctionDeclaration':
+			return toIdentifier(node.id);
 		case 'VariableDeclaration': {
 			for (; i < node.declarations.length; i++) {
 				tmp = toIdentifier(node.declarations[i]);
@@ -36,13 +43,6 @@ export function toIdentifier(node) {
 			}
 			return out;
 		}
-		case 'ImportSpecifier':
-		case 'ImportDefaultSpecifier':
-		case 'ImportNamespaceSpecifier':
-			return toIdentifier(node.local);
-		case 'VariableDeclarator':
-		case 'FunctionDeclaration':
-			return toIdentifier(node.id);
 		case 'ObjectPattern': {
 			for (; i < node.properties.length; i++) {
 				tmp = toIdentifier(node.properties[i].value); // the alias
