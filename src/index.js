@@ -11,13 +11,10 @@ export function walk(node, visitor, state, parent) {
 	}
 
 	if (Array.isArray(node)) {
-		// if (!state) state = {};
 		for (let tmp, item, i=0; i < node.length; i++) {
 			tmp = walk(item = node[i], visitor, state, parent);
-			if (tmp === false) node.splice(i--, 1);
+			if (tmp === REMOVE) node.splice(i--, 1);
 			else if (tmp && tmp !== item) node[i] = tmp;
-			// else if (tmp === item) continue;
-			// else node[i] = tmp; // else if tmp.node?
 		}
 		return node;
 	}
@@ -27,11 +24,9 @@ export function walk(node, visitor, state, parent) {
 
 	let key, item, xyz;
 	let block = visitor[type];
-	// if (!state) state = {};
 
 	if (node.path === void 0) {
-		// scanned: false,
-		// bindings: {},
+		// scanned: false, bindings: {},
 		node.path = { parent };
 	}
 	// need this?
