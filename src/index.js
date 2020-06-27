@@ -1,6 +1,7 @@
 import { toIdentifier } from './utils';
 
 export const SKIP = true;
+// export const BREAK = false;
 export const REMOVE = false;
 
 export function walk(node, visitor, state, parent) {
@@ -93,30 +94,28 @@ export function lookup(baseNode, target) {
 	while (parent = parent.path.parent) {
 		// TODO: incomplete parent.type list ?
 		let dict = parent.path.bindings || parent.path.scoped;
-		console.log('~> parent.type', parent.type, dict);
+		// console.log('~> parent.type', parent.type, dict);
 
 		if (dict === void 0) {
 			dict = {}; // WIP scoped
 
 			if (parent.type === 'BlockStatement') {
-				let arr = parent.body;
-				console.log('block body', arr);
-
-				// should not happen?
-				if (!arr.length) continue;
-
-				walk(arr, {
-					FunctionDeclaration(fnode) {
-						console.log('[FOUND][INNER] FunctionDeclaration: ', fnode);
-					},
-					VariableDeclarator(vnode) {
-						if (vnode.id.type === 'Identifier') {
-							dict[vnode.id.name] = vnode;
-						} else {
-							console.log('[TODO] Non-Identifier Variable:', vnode.type, vnode);
-						}
-					},
-				});
+				// shouldnt happen?
+				// can't enter ~into~ an empty parent from a child
+				if (parent.body.length) {
+					walk(parent.body, {
+						FunctionDeclaration(fnode) {
+							console.log('[FOUND][INNER] FunctionDeclaration: ', fnode);
+						},
+						VariableDeclarator(vnode) {
+							if (vnode.id.type === 'Identifier') {
+								dict[vnode.id.name] = vnode;
+							} else {
+								console.log('[TODO] Non-Identifier Variable:', vnode.type, vnode);
+							}
+						},
+					});
+				}
 			} else if (parent.type === 'FunctionDeclaration') {
 				let tmp = toIdentifier(parent);
 				// if (tmp && !dict[tmp]) dict[tmp] = parent;

@@ -4,6 +4,20 @@ import * as assert from 'uvu/assert';
 import { parse } from './helpers';
 import * as astray from '../src';
 
+const ENUM = suite('ENUM');
+
+ENUM('SKIP', () => {
+	assert.is(astray.SKIP, true);
+});
+
+ENUM('REMOVE', () => {
+	assert.is(astray.REMOVE, false);
+});
+
+ENUM.run();
+
+// ---
+
 const walk = suite('walk');
 
 walk('should be a function', () => {
@@ -598,8 +612,8 @@ lookup('should be a function', () => {
 	assert.type(astray.lookup, 'function');
 });
 
-lookup('should return all bindings for a Node', () => {
-	const { node, program } = setup('foobar', `
+lookup('should return all bindings input Node', () => {
+	const { node } = setup('foobar', `
 		const API = 'https://...';
 
 		function Hello(props) {
@@ -615,7 +629,71 @@ lookup('should return all bindings for a Node', () => {
 	const idents = Object.keys(output);
 	assert.equal(idents, ['foobar', 'Hello', 'props', 'API']);
 
-	console.log(output); // TODO
+	assert.is(output.foobar.type, 'VariableDeclarator');
+	assert.is(output.Hello.type, 'FunctionDeclaration');
+	assert.is(output.props.type, 'Identifier'); // TODO: link function?
+	assert.is(output.API.type, 'VariableDeclaration'); // TODO: inconsistent V/ion|or
+});
+
+lookup('should fill ancestry with bindings caches', () => {
+	const { node } = setup('foobar', `
+		const API = 'https://...';
+
+		function Hello(props) {
+			var foobar = props.name || (API + '/hello');
+		}
+	`);
+
+	assert.ok(node, 'found "foobar" ident');
+
+	const { foobar, Hello, props, API } = astray.lookup(node);
+
+	assert.is(foobar.path.scanned, true);
+	assert.equal(Object.keys(foobar.path.scoped), []);
+	assert.equal(Object.keys(foobar.path.bindings), ['foobar', 'Hello', 'props', 'API']);
+
+	assert.is(Hello.path.scanned, true);
+	assert.equal(Object.keys(Hello.path.scoped), ['Hello', 'props']);
+	assert.equal(Object.keys(Hello.path.bindings), ['Hello', 'props', 'API']);
+
+	// TODO: is this right?
+	assert.is('scoped' in props.path, false);
+	assert.is('scanned' in props.path, false);
+	assert.is('bindings' in props.path, false);
+
+	// TODO: is this right?
+	assert.is('scoped' in API.path, false);
+	assert.is('scanned' in API.path, false);
+	assert.is('bindings' in API.path, false);
+});
+
+lookup('should return early when `target` found', () => {
+	const { node } = setup('foobar', `
+		const API = 'https://...';
+
+		function Hello(props) {
+			var foobar = props.name || (API + '/hello');
+		}
+	`);
+
+	assert.ok(node, 'found "foobar" ident');
+
+	const output = astray.lookup(node, 'Hello');
+	assert.type(output, 'object');
+
+	const idents = Object.keys(output);
+	assert.equal(idents, ['foobar', 'Hello', 'props']);
+
+	const { foobar, Hello } = output;
+
+	// incomplete ancestry
+	assert.is(foobar.path.scanned, false);
+	assert.is('bindings' in foobar, false);
+	assert.equal(foobar.path.scoped, {});
+
+	assert.is(Hello.path.scanned, false);
+	assert.is('bindings' in Hello, false);
+	assert.equal(Object.keys(Hello.path.scoped), ['Hello', 'props']);
 });
 
 lookup.run();
