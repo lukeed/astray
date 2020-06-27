@@ -645,6 +645,36 @@ lookup('should return all bindings input Node', () => {
 	assert.is(output.API.type, 'VariableDeclaration'); // TODO: inconsistent V/ion|or
 });
 
+lookup('should introduce sibling scopes', () => {
+	const { node } = setup('hello', `
+		function Hello(props) {
+			let { foo, bar } = greet();
+			var hello = 'world';
+
+			function init() {
+				console.log({ hello });
+			}
+		}
+	`);
+
+	assert.ok(node, 'found "hello" ident');
+
+	const output = astray.lookup(node);
+	assert.type(output, 'object');
+
+	assert.equal(
+		Object.keys(output),
+		['init', 'foo', 'bar', 'hello', 'Hello', 'props']
+	);
+
+	assert.is(output.foo.type, output.bar.type);
+	assert.is(output.bar.type, 'VariableDeclarator');
+	assert.is(output.hello.type, 'VariableDeclarator'); // TODO: inconsistent V/ion|or
+	assert.is(output.init.type, 'FunctionDeclaration');
+	assert.is(output.Hello.type, 'FunctionDeclaration');
+	assert.is(output.props.type, 'Identifier'); // TODO: link func?
+});
+
 lookup('should fill ancestry with bindings caches', () => {
 	const { node } = setup('foobar', `
 		const API = 'https://...';

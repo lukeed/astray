@@ -109,11 +109,10 @@ export function lookup(baseNode, target) {
 							dict[fnode.id.name] = fnode;
 						},
 						VariableDeclarator(vnode) {
-							if (vnode.id.type === 'Identifier') {
-								dict[vnode.id.name] = vnode;
-							} else {
-								console.log('[TODO] Non-Identifier Variable:', vnode.type, vnode);
-							}
+							let tmp = toIdentifier(vnode.id);
+							// TODO: extract this loop/concat pattern
+							if (Array.isArray(tmp)) tmp.forEach(x => dict[x] = vnode);
+							else if (tmp) dict[tmp] = vnode;
 						},
 					});
 				}
