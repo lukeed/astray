@@ -105,7 +105,8 @@ export function lookup(baseNode, target) {
 				if (parent.body.length) {
 					walk(parent.body, {
 						FunctionDeclaration(fnode) {
-							console.log('[FOUND][INNER] FunctionDeclaration: ', fnode);
+							// Can only be Identifier
+							dict[fnode.id.name] = fnode;
 						},
 						VariableDeclarator(vnode) {
 							if (vnode.id.type === 'Identifier') {

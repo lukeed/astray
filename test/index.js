@@ -617,6 +617,12 @@ lookup('should return all bindings input Node', () => {
 		const API = 'https://...';
 
 		function Hello(props) {
+			const greet = str => 'Hello, ' + str;
+
+			function say(str) {
+				console.log('inner', str);
+			}
+
 			var foobar = props.name || (API + '/hello');
 		}
 	`);
@@ -626,10 +632,14 @@ lookup('should return all bindings input Node', () => {
 	const output = astray.lookup(node);
 	assert.type(output, 'object');
 
-	const idents = Object.keys(output);
-	assert.equal(idents, ['foobar', 'Hello', 'props', 'API']);
+	assert.equal(
+		Object.keys(output),
+		['greet', 'say', 'foobar', 'Hello', 'props', 'API']
+	);
 
-	assert.is(output.foobar.type, 'VariableDeclarator');
+	assert.is(output.say.type, 'FunctionDeclaration');
+	assert.is(output.greet.type, 'VariableDeclarator'); // TODO: inconsistent V/ion|or
+	assert.is(output.foobar.type, 'VariableDeclarator'); // TODO: inconsistent V/ion|or
 	assert.is(output.Hello.type, 'FunctionDeclaration');
 	assert.is(output.props.type, 'Identifier'); // TODO: link function?
 	assert.is(output.API.type, 'VariableDeclaration'); // TODO: inconsistent V/ion|or
