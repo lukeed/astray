@@ -11,6 +11,9 @@ type Block<N, S> = {
 
 export type Path<T> = T & {
 	parent: ESTree.Node | void;
+	scanned?: boolean;
+	bindings?: Record<string, ESTree.Node>;
+	locals?: Record<string, ESTree.Node>;
 }
 
 export type Visitor<S> = {

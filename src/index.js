@@ -79,61 +79,89 @@ export function walk(node, visitor, state, parent) {
 	return node;
 }
 
+// scoped = wip, own list
+// scanned = done, seen parents
+// bindings = done, full list
 export function lookup(baseNode, target) {
+	let output = baseNode.path;
+	let tracking = [output];
+	let program = false; // at end?
 	let parent = baseNode;
-	let output = {}; // TODO: need to assign to each parent
+
+	output = (output.bindings = output.bindings || {});
 
 	while (parent = parent.path.parent) {
-		// TODO: incomplete types list
-		if (parent.path.scanned) { // TODO: setter
-			for (let k in parent.path.bindings) {
-				if (!output[k]) output[k] = parent.path.bindings[k];
-			}
-		} else if (parent.type === 'BlockStatement') {
-			let arr = parent.body;
+		// TODO: incomplete parent.type list ?
+		let dict = parent.path.bindings || parent.path.scoped;
+		console.log('~> parent.type', parent.type, dict);
 
-			// should not happen?
-			if (!arr.length) continue;
+		if (dict === void 0) {
+			dict = {}; // WIP scoped
 
-			walk(arr, {
-				FunctionDeclaration(fnode) {
-					console.log('[FOUND][INNER] FunctionDeclaration: ', fnode);
-				},
-				VariableDeclarator(vnode) {
-					if (vnode.id.type === 'Identifier') {
-						output[vnode.id.name] = vnode;
-					} else {
-						console.log('[TODO] Non-Identifier Variable:', vnode.type, vnode);
+			if (parent.type === 'BlockStatement') {
+				let arr = parent.body;
+				console.log('block body', arr);
+
+				// should not happen?
+				if (!arr.length) continue;
+
+				walk(arr, {
+					FunctionDeclaration(fnode) {
+						console.log('[FOUND][INNER] FunctionDeclaration: ', fnode);
+					},
+					VariableDeclarator(vnode) {
+						if (vnode.id.type === 'Identifier') {
+							dict[vnode.id.name] = vnode;
+						} else {
+							console.log('[TODO] Non-Identifier Variable:', vnode.type, vnode);
+						}
+					},
+				});
+			} else if (parent.type === 'FunctionDeclaration') {
+				let tmp = toIdentifier(parent);
+				// if (tmp && !dict[tmp]) dict[tmp] = parent;
+				if (tmp) dict[tmp] = dict[tmp] || parent;
+
+				// TODO: point to parent ref?
+				parent.params.forEach(obj => {
+					if (tmp = toIdentifier(obj)) {
+						// if (!dict[tmp]) dict[tmp] = obj;
+						dict[tmp] = dict[tmp] || obj;
 					}
-				},
-			});
-		} else if (parent.type === 'FunctionDeclaration') {
-			let tmp = toIdentifier(parent);
-			if (tmp && !output[tmp]) output[tmp] = parent;
+				});
+			} else if (parent.type === 'Program') {
+				let i=0, tmp, arr=parent.body;
+				for (; i < arr.length; i++) {
+					if (tmp = toIdentifier(arr[i])) {
+						// TODO: no concat
+						[].concat(tmp).forEach(str => {
+							// if (output[str]) return;
+							// output[str] = arr[i];
+							dict[str] = dict[str] || arr[i];
+						});
+					}
+				}
+				program = true; // ~> scanned = true
+			}
 
-			// TODO: point to parent ref?
-			parent.params.forEach(obj => {
-				if (tmp = toIdentifier(obj)) {
-					if (!output[tmp]) output[tmp] = obj;
-				}
-			});
-		} else if (parent.type === 'Program') {
-			let i=0, tmp, arr=parent.body;
+			parent.path.scoped = dict;
+			parent.path.bindings = {};
+		}
+
+		parent.path.scanned || tracking.push(parent.path);
+
+		// this sucks
+		for (let key in dict) {
+			let i=0, tmp, arr=tracking;
 			for (; i < arr.length; i++) {
-				if (tmp = toIdentifier(arr[i])) {
-					[].concat(tmp).forEach(str => {
-						if (output[str]) return;
-						output[str] = arr[i];
-					});
-				}
+				tmp = arr[i];
+				tmp.scanned = tmp.scanned || program;
+				tmp.bindings[key] = tmp.bindings[key] || dict[key];
 			}
 		}
 
-		// TODO: Assign THIS LOOP'S scopes to this parent
-		// parent.path.scanned = true;
-
-		// Stop early if found the given target
-		if (target && output[target]) return output;
+		// Stop if found the given target
+		if (target && output[target]) break;
 	}
 
 	return output;

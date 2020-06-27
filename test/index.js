@@ -578,10 +578,44 @@ replace.run();
 
 // ---
 
+function setup(ident, source) {
+	let node, program = parse(source);
+	astray.walk(program, {
+		Identifier(n) {
+			if (n.name === ident) {
+				node = n;
+			}
+		}
+	});
+	return { node, program };
+}
+
+// ---
+
 const lookup = suite('lookup');
 
 lookup('should be a function', () => {
 	assert.type(astray.lookup, 'function');
+});
+
+lookup('should return all bindings for a Node', () => {
+	const { node, program } = setup('foobar', `
+		const API = 'https://...';
+
+		function Hello(props) {
+			var foobar = props.name || (API + '/hello');
+		}
+	`);
+
+	assert.ok(node, 'found "foobar" ident');
+
+	const output = astray.lookup(node);
+	assert.type(output, 'object');
+
+	const idents = Object.keys(output);
+	assert.equal(idents, ['foobar', 'Hello', 'props', 'API']);
+
+	console.log(output); // TODO
 });
 
 lookup.run();
