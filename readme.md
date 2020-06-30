@@ -117,6 +117,8 @@ While doing so, each _parent_ context container (eg, `BlockStatement`, `Function
 
 A dictionary of scopes are returned for the `node`. This will be an object whose keys are the identifer names and whose values are references to the nodes that the identifer points to.
 
+> **Note:** The return object will always include the `node` itself.
+
 #### node
 Type: `any`
 
