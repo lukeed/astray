@@ -89,6 +89,15 @@ toIdentifier('ImportDeclaration :: mixed', () => {
 	assert.equal(utils.toIdentifier(node), ['foo', 'bar', 'baz', 't']);
 });
 
+toIdentifier('ImportDeclaration :: invalid', () => {
+	const output = utils.toIdentifier({
+		type: 'ImportDeclaration',
+		specifiers: [{ type: 'foobar' }]
+	});
+
+	assert.equal(output, []);
+});
+
 
 toIdentifier('ExportNamedDeclaration :: mixed', () => {
 	const node = transform(`import foo, { bar, baz, bat as t } from 'foo';`);
@@ -156,6 +165,15 @@ toIdentifier('VariableDeclaration :: function :: named', () => {
 	assert.equal(utils.toIdentifier(node), ['foo']);
 });
 
+toIdentifier('VariableDeclaration :: invalid', () => {
+	const output = utils.toIdentifier({
+		type: 'VariableDeclaration',
+		declarations: [{ type: 'foobar' }]
+	});
+
+	assert.equal(output, []);
+});
+
 
 toIdentifier('FunctionDeclaration', () => {
 	const node = transform(`function foo () {}`);
@@ -178,6 +196,15 @@ toIdentifier('ObjectPattern :: simple', () => {
 toIdentifier('ObjectPattern :: nested', () => {
 	const node = transform(`let { foo: { bar } } = foobar();`);
 	assert.equal(utils.toIdentifier(node), ['bar']);
+});
+
+toIdentifier('ObjectPattern :: invalid', () => {
+	const output = utils.toIdentifier({
+		type: 'ObjectPattern',
+		properties: [{ type: 'foobar' }]
+	});
+
+	assert.equal(output, []);
 });
 
 
