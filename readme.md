@@ -292,6 +292,8 @@ Benchmark:
   astray             x 144.37 ops/sec ±0.56% (80 runs sampled)
 ```
 
+> **Note:**<br>I've not (yet) investigated as to _why_ `@babel/traverse` and `acorn-walk` counts are incorrect – but they are.<br>All methods exported by `acorn-walk` (simple, full, recursive) have been tried and return the same value.<br>Run `$ cat bench/fixture.json | grep "Identifier" | wc -l` to verify the `41,669` figure.
+
 ## License
 
 MIT © [Luke Edwards](https://lukeed.com)
