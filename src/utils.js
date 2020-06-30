@@ -37,9 +37,7 @@ export function toIdentifier(node) {
 		}
 		case 'ImportDeclaration': {
 			for (; i < node.specifiers.length; i++) {
-				tmp = toIdentifier(node.specifiers[i]);
-				if (Array.isArray(tmp)) flat(tmp, out);
-				else if (tmp) out.push(tmp);
+				if (tmp = toIdentifier(node.specifiers[i])) out.push(tmp);
 			}
 			return out;
 		}
