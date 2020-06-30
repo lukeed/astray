@@ -179,7 +179,7 @@ path.run();
 
 const remove = suite('remove');
 
-remove('should remove Node on remove() :: block', () => {
+remove('should remove Node :: block', () => {
 	const program = parse(`
 		let name = 'lukeed';
 		if (HUMANIZE) name = 'Luke';
@@ -191,7 +191,7 @@ remove('should remove Node on remove() :: block', () => {
 	let idents = 0;
 	astray.walk(program, {
 		IfStatement() {
-			return false; // REMOVE
+			return astray.REMOVE;
 		},
 		Identifier() {
 			idents++;
@@ -211,7 +211,7 @@ remove('should remove Node on remove() :: block', () => {
 	assert.is(exists, false);
 });
 
-remove('should remove Node on remove() :: enter', () => {
+remove('should remove Node :: enter', () => {
 	const program = parse(`
 		let name = 'lukeed';
 		if (HUMANIZE) name = 'Luke';
@@ -223,7 +223,7 @@ remove('should remove Node on remove() :: enter', () => {
 	let idents = 0;
 	astray.walk(program, {
 		IfStatement: {
-			enter: () => false // REMOVE
+			enter: () => astray.REMOVE
 		},
 		Identifier() {
 			idents++;
@@ -243,7 +243,7 @@ remove('should remove Node on remove() :: enter', () => {
 	assert.is(exists, false);
 });
 
-remove('should remove Node on remove() :: exit', () => {
+remove('should remove Node :: exit', () => {
 	const program = parse(`
 		let name = 'lukeed';
 		if (HUMANIZE) name = 'Luke';
@@ -255,7 +255,7 @@ remove('should remove Node on remove() :: exit', () => {
 	let idents = 0;
 	astray.walk(program, {
 		IfStatement: {
-			exit: () => false // REMOVE
+			exit: () => astray.REMOVE
 		},
 		Identifier() {
 			idents++;
@@ -281,7 +281,7 @@ remove.run();
 
 const skip = suite('skip');
 
-skip('should skip Node children if parent visitor returns `true`', () => {
+skip('should skip Node children if parent dictates', () => {
 	const program = parse(`
 		export function hello(props) {
 			if (props.disabled) {
@@ -295,7 +295,7 @@ skip('should skip Node children if parent visitor returns `true`', () => {
 	let count = 0;
 	astray.walk(program, {
 		IfStatement() {
-			return true; // SKIP
+			return astray.SKIP;
 		},
 		Identifier(node) {
 			count++;
@@ -321,8 +321,7 @@ skip('should skip Node children :: block', () => {
 			idents.push(node.name);
 		},
 		IfStatement(node) {
-			// node.path.skip();
-			return true; // SKIP
+			return astray.SKIP;
 		},
 	});
 
@@ -346,8 +345,7 @@ skip('should skip Node children :: enter', () => {
 		},
 		IfStatement: {
 			enter(node) {
-				// node.path.skip();
-				return true; // SKIP
+				return astray.SKIP;
 			},
 		}
 	});
@@ -372,8 +370,7 @@ skip('should skip Node children :: exit', () => {
 		},
 		IfStatement: {
 			exit(node) {
-				// node.path.skip();
-				return true; // SKIP
+				return astray.SKIP;
 			},
 		}
 	});
