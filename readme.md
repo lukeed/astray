@@ -1,4 +1,4 @@
-# astray [![CI](https://github.com/lukeed/astray/workflows/CI/badge.svg)](https://github.com/lukeed/astray/actions) [![codecov](https://badgen.now.sh/codecov/c/github/lukeed/astray)](https://codecov.io/gh/lukeed/astray)
+# astray [![CI](https://github.com/lukeed/astray/workflows/CI/badge.svg)](https://github.com/lukeed/astray/actions) [![codecov](https://badgen.net/codecov/c/github/lukeed/astray)](https://codecov.io/gh/lukeed/astray)
 
 > A tiny (1.01 kB) and [fast](#benchmarks) utility to walk an AST without being led astray.
 
