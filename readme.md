@@ -263,11 +263,11 @@ for (let key in bindings) {
 How long does it take to `require` the dependency?
 
 ```
-@babel/traverse:  162.856ms
-estree-walker:      0.747ms
-acorn-walk:         1.545ms
-ast-types:         28.951ms
-astray:             0.593ms
+@babel/traverse:  174.038ms
+estree-walker:      0.711ms
+acorn-walk:         1.329ms
+ast-types:         31.591ms
+astray:             0.544ms
 ```
 
 ***Walking***
@@ -283,11 +283,11 @@ Validation:
   ✔ astray           (41,669 identifiers)
 
 Benchmark:
-  @babel/traverse    x  16.73 ops/sec ±4.53% (46 runs sampled)
-  estree-walker      x 115.33 ops/sec ±0.60% (73 runs sampled)
-  acorn-walk         x 101.10 ops/sec ±0.67% (74 runs sampled)
-  ast-types          x   4.96 ops/sec ±6.79% (17 runs sampled)
-  astray             x 142.06 ops/sec ±0.52% (80 runs sampled)
+  @babel/traverse    x  17.36 ops/sec ±3.33% (47 runs sampled)
+  estree-walker      x 122.31 ops/sec ±0.52% (78 runs sampled)
+  acorn-walk         x 106.12 ops/sec ±0.38% (77 runs sampled)
+  ast-types          x   5.20 ops/sec ±7.53% (17 runs sampled)
+  astray             x 144.37 ops/sec ±0.56% (80 runs sampled)
 ```
 
 ## License
