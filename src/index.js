@@ -1,7 +1,6 @@
 import { toIdentifier, toNode } from './utils';
 
 export const SKIP = true;
-// export const BREAK = false;
 export const REMOVE = false;
 
 export function walk(node, visitor, state, parent) {
@@ -14,8 +13,9 @@ export function walk(node, visitor, state, parent) {
 	if (Array.isArray(node)) {
 		for (let tmp, item, i=0; i < node.length; i++) {
 			tmp = walk(item = node[i], visitor, state, parent);
+			if (tmp == null) continue;
 			if (tmp === REMOVE) node.splice(i--, 1);
-			else if (tmp && tmp !== item) node[i] = tmp;
+			else if (tmp !== item) node[i] = tmp;
 		}
 		return node;
 	}
@@ -27,13 +27,8 @@ export function walk(node, visitor, state, parent) {
 	let block = visitor[type];
 
 	if (node.path === void 0) {
-		// scanned: false, bindings: {},
 		node.path = { parent };
 	}
-	// need this?
-	// else if (!parent) {
-	// 	parent = node.path.parent;
-	// }
 
 	if (block) {
 		if (typeof block === 'function') {
@@ -42,13 +37,15 @@ export function walk(node, visitor, state, parent) {
 			xyz = block.enter(node, state);
 		}
 
-		if (xyz === SKIP) {
-			return node; // skip traverse
-		} else if (xyz === REMOVE) {
-			return REMOVE;
-		} else if (xyz) {
-			xyz.path = node.path;
-			node = xyz;
+		if (xyz != null) {
+			if (xyz === SKIP) {
+				return node; // skip traverse
+			} else if (xyz === REMOVE) {
+				return REMOVE;
+			} else {
+				xyz.path = node.path;
+				node = xyz;
+			}
 		}
 	}
 
@@ -59,21 +56,24 @@ export function walk(node, visitor, state, parent) {
 			if (typeof item !== 'object') continue;
 
 			xyz = walk(item, visitor, state, node);
+			if (xyz == null) continue;
 			if (xyz === REMOVE) delete node[key];
-			else if (xyz && xyz !== item) node[key] = xyz;
+			else if (xyz !== item) node[key] = xyz;
 		}
 	}
 
 	if (block && block.exit) {
 		xyz = block.exit(node, state);
 
-		if (xyz === SKIP) {
-			// too late to skip
-		} else if (xyz === REMOVE) {
-			return REMOVE;
-		} else if (xyz) {
-			xyz.path = node.path;
-			node = xyz;
+		if (xyz != null) {
+			if (xyz === SKIP) {
+				// too late to skip
+			} else if (xyz === REMOVE) {
+				return REMOVE;
+			} else {
+				xyz.path = node.path;
+				node = xyz;
+			}
 		}
 	}
 
