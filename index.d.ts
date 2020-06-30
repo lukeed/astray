@@ -20,8 +20,8 @@ export type Visitor<S> = {
 	[K in NodeNames]?: Handler<ESTree.Nodes[K], S> | Block<ESTree.Nodes[K], S>;
 }
 
-export const SKIP = boolean;
-export const REMOVE = boolean;
+export const SKIP: boolean;
+export const REMOVE: boolean;
 
 export function walk<T, S = Fallback>(node: T, visitor: Visitor<S>, state?: S, parent?: ESTree.Node): Path<T>;
 export function lookup<T = ESTree.Node>(node: T, target?: string): Record<string, ESTree.Node>;

@@ -115,7 +115,7 @@ Find all [bindings](#scopes) that are accessible to this `node` by scaling its a
 
 While doing so, each _parent_ context container (eg, `BlockStatement`, `FunctionDeclaration`, or `Program`) is assigned its own cache of available bindings. See [Path Context](#path-context) for more.
 
-A dctionary of scopes are returned for the `node`. This will be an object whose keys are the identifer names and whose values are references to the nodes that the identifer points to.
+A dictionary of scopes are returned for the `node`. This will be an object whose keys are the identifer names and whose values are references to the nodes that the identifer points to.
 
 #### node
 Type: `any`
@@ -199,11 +199,11 @@ When scaling a `node`'s ancestry (`astray.lookup`), additional keys are added to
 * **bindings** &mdash; a dictionary of [_all bindings_](#scopes) _accessible by_ this node, including its own;
 * **scanned** &mdash; a `boolean` indicating that the `bindings` dictionary is complete; aka, has seen all parents
 
-> **Important:** Only **parent** contexts contain scope information.<br>These include `BlockStatement`, `FunctionDeclaration`, and `Program` node types.
+> **Important:** Only **parent** contexts contain scope information. <br>These include `BlockStatement`, `FunctionDeclaration`, and `Program` node types.
 
 ## Scopes
 
-When using [`astray.lookup()`](#astraylookupnode-t-target-string), path contexts _may_ obtain scope/binding information.<br>These are records of what each parent container _provides_ (`node.path.scoped`) as well as what is _accessible_ (`node.path.bindings`) to this scope level. Additionally, if a node/parent's _entire_ ancestry has been recorded, then `node.path.scanned` will be true.
+When using [`astray.lookup()`](#astraylookupnode-t-target-string), path contexts _may_ obtain scope/binding information. <br>These are records of what each parent container _provides_ (`node.path.scoped`) as well as what is _accessible_ (`node.path.bindings`) to this scope level. Additionally, if a node/parent's _entire_ ancestry has been recorded, then `node.path.scanned` will be true.
 
 The records of bindings (including `astray.lookup`'s return value) are objects keyed by the identifier names. The keys' values are references to the node that included/defined that identifier. For example, this means that `VariableDeclarator`s will be returned instead of the `VariableDeclaration` that contained them. You may still access the `VariableDeclaration` via the `VariableDeclarator`s path context (`node.path.parent`).
 
@@ -272,7 +272,7 @@ astray:             0.544ms
 
 ***Walking***
 
-All candidates traverse the preparsed AST (ESTree format) of `d3.min.js`.<br>Each candidate must count the `Identifier` nodes seen as a validation step.
+All candidates traverse the pre-parsed AST (ESTree format) of `d3.min.js`. <br>Each candidate must count the `Identifier` nodes seen as a validation step.
 
 ```
 Validation:
