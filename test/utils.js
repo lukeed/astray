@@ -177,3 +177,14 @@ toIdentifier('Unknown', () => {
 });
 
 toIdentifier.run();
+
+
+// ---
+
+const toNode = suite('toNode');
+
+toNode('is a function', () => {
+	assert.type(utils.toNode, 'function');
+});
+
+toNode.run();
