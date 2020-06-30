@@ -62,30 +62,16 @@ export function toNode(node) {
 		node = node.declaration;
 	}
 
-	let i=0, tmp, out=[];
-
 	switch (node.type) {
+		case 'VariableDeclaration':
+			return node.declarations;
+		case 'ImportDeclaration':
+			return node.specifiers;
 		case 'ImportSpecifier':
 		case 'ImportDefaultSpecifier':
 		case 'ImportNamespaceSpecifier':
 		case 'FunctionDeclaration':
 		case 'VariableDeclarator':
 			return node;
-		case 'VariableDeclaration': {
-			for (; i < node.declarations.length; i++) {
-				tmp = toNode(node.declarations[i]);
-				if (Array.isArray(tmp)) flat(tmp, out);
-				else if (tmp) out.push(tmp);
-			}
-			return out;
-		}
-		case 'ImportDeclaration': {
-			for (; i < node.specifiers.length; i++) {
-				tmp = toNode(node.specifiers[i]);
-				if (Array.isArray(tmp)) flat(tmp, out);
-				else if (tmp) out.push(tmp);
-			}
-			return out;
-		}
 	}
 }

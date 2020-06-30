@@ -3,7 +3,17 @@ import * as assert from 'uvu/assert';
 import * as utils from '../src/utils';
 import { parse } from './helpers';
 
-const transform = (str) => parse(str).body[0];
+function transform(str) {
+	return parse(str).body[0];
+}
+
+function isNode(node, type, isLength) {
+	assert.is(Array.isArray(node), !!isLength);
+	if (isLength != null) assert.is(node.length, isLength);
+	assert.is((isLength ? node[0] : node).type, type);
+}
+
+// ---
 
 const flat = suite('flat');
 
@@ -178,13 +188,144 @@ toIdentifier('Unknown', () => {
 
 toIdentifier.run();
 
-
 // ---
 
 const toNode = suite('toNode');
 
 toNode('is a function', () => {
 	assert.type(utils.toNode, 'function');
+});
+
+toNode('Identifier', () => {
+	const ident = { type: 'Identifier', name: 'foobar' };
+	assert.equal(utils.toNode(ident), undefined);
+});
+
+toNode('ImportDeclaration :: ImportSpecifier', () => {
+	const foo = transform(`import { foo } from 'baz'`);
+	isNode(utils.toNode(foo), 'ImportSpecifier', 1);
+
+	const bar = transform(`import { foo, bar } from 'baz';`);
+	isNode(utils.toNode(bar), 'ImportSpecifier', 2);
+
+	const baz = transform(`import { foo as bar } from 'baz';`);
+	isNode(utils.toNode(baz), 'ImportSpecifier', 1);
+
+	const bat = transform(`import { foo as f, bar as b } from 'baz';`);
+	isNode(utils.toNode(bat), 'ImportSpecifier', 2);
+});
+
+toNode('ImportDeclaration :: ImportDefaultSpecifier', () => {
+	const node = transform(`import foo from 'foo';`);
+	isNode(utils.toNode(node), 'ImportDefaultSpecifier', 1);
+});
+
+toNode('ImportDeclaration :: ImportNamespaceSpecifier', () => {
+	const node = transform(`import * as foo from 'foo';`);
+	isNode(utils.toNode(node), 'ImportNamespaceSpecifier', 1);
+});
+
+toNode('ImportDeclaration :: mixed', () => {
+	const node = transform(`import foo, { bar, baz, bat as t } from 'foo';`);
+	const output = utils.toNode(node);
+	assert.instance(output, Array);
+	assert.is(output.length, 4);
+
+	const types = output.map(x => x.type);
+	assert.equal(types, ['ImportDefaultSpecifier', 'ImportSpecifier', 'ImportSpecifier', 'ImportSpecifier']);
+});
+
+toNode('ExportDefaultDeclaration :: FunctionDeclaration', () => {
+	const foo = transform(`export default function () {}`);
+	isNode(utils.toNode(foo), 'FunctionDeclaration');
+
+	const bar = transform(`export default function bar() {}`);
+	isNode(utils.toNode(bar), 'FunctionDeclaration');
+});
+
+toNode('ExportNamedDeclaration :: FunctionDeclaration', () => {
+	const foo = transform(`export function foo() {}`);
+	isNode(utils.toNode(foo), 'FunctionDeclaration');
+});
+
+// Returns array of VariableDeclarators
+toNode('ExportNamedDeclaration :: VariableDeclaration', () => {
+	const foo = transform(`export const foo = 123;`);
+	isNode(utils.toNode(foo), 'VariableDeclarator', 1);
+
+	const bar = transform(`export const foo = 1, bar = 2;`);
+	isNode(utils.toNode(bar), 'VariableDeclarator', 2);
+
+	const baz = transform(`export var foo = 123;`);
+	isNode(utils.toNode(baz), 'VariableDeclarator', 1);
+
+	const bat = transform(`export let foo = 123;`);
+	isNode(utils.toNode(bat), 'VariableDeclarator', 1);
+
+	const quz = transform(`export var foo = function () {};`);
+	isNode(utils.toNode(quz), 'VariableDeclarator', 1);
+});
+
+toNode('ExportNamedDeclaration :: ExportSpecifer', () => {
+	const foo = transform(`export { foo }`);
+	assert.is(utils.toNode(foo), undefined);
+
+	const bar = transform(`export { foo as bar }`);
+	assert.is(utils.toNode(bar), undefined);
+});
+
+// Returns inner Declarators
+toNode('VariableDeclaration :: single', () => {
+	const foo = transform(`var foo = 123;`);
+	isNode(utils.toNode(foo), 'VariableDeclarator', 1);
+
+	const bar = transform(`let foo = 123;`);
+	isNode(utils.toNode(bar), 'VariableDeclarator', 1);
+
+	const baz = transform(`const foo = 123;`);
+	isNode(utils.toNode(baz), 'VariableDeclarator', 1);
+});
+
+toNode('VariableDeclaration :: multiple', () => {
+	const foo = transform(`var foo=123, bar=456;`);
+	isNode(utils.toNode(foo), 'VariableDeclarator', 2);
+
+	const bar = transform(`var foo, bar=1, baz=2;`);
+	isNode(utils.toNode(bar), 'VariableDeclarator', 3);
+});
+
+toNode('VariableDeclaration :: FunctionExpression', () => {
+	const foo = transform(`const foo = function foo() {};`);
+	isNode(utils.toNode(foo), 'VariableDeclarator', 1);
+
+	const bar = transform(`const foo = function bar() {};`);
+	isNode(utils.toNode(bar), 'VariableDeclarator', 1);
+
+	const baz = transform(`const foo = function () {};`);
+	isNode(utils.toNode(baz), 'VariableDeclarator', 1);
+});
+
+toNode('VariableDeclaration :: CallExpression', () => {
+	const foo = transform(`const foo = (function () {})();`);
+	isNode(utils.toNode(foo), 'VariableDeclarator', 1);
+});
+
+toNode('VariableDeclaration :: ObjectExpression', () => {
+	const foo = transform(`var { foo, bar } = foobar();`);
+	isNode(utils.toNode(foo), 'VariableDeclarator', 1);
+
+	const bar = transform(`let { foo: { bar } } = foobar();`);
+	isNode(utils.toNode(bar), 'VariableDeclarator', 1);
+});
+
+toNode('FunctionDeclaration', () => {
+	const foo = transform(`function foo() {}`);
+	isNode(utils.toNode(foo), 'FunctionDeclaration');
+});
+
+toNode('Unknown', () => {
+	const node = { type: 'foo', value: 'bar' };
+	assert.is(utils.toNode(node), undefined);
 });
 
 toNode.run();
