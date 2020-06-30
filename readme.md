@@ -1,4 +1,4 @@
-# astray [![CI](https://github.com/lukeed/astray/workflows/CI/badge.svg)](https://github.com/lukeed/astray/actions) [![codecov](https://badgen.now.sh/codecov/c/github/lukeed/TODO)](https://codecov.io/gh/lukeed/TODO)
+# astray [![CI](https://github.com/lukeed/astray/workflows/CI/badge.svg)](https://github.com/lukeed/astray/actions) [![codecov](https://badgen.now.sh/codecov/c/github/lukeed/astray)](https://codecov.io/gh/lukeed/astray)
 
 > A tiny (1.01 kB) and [fast](#benchmarks) utility to walk an AST without being led astray.
 
@@ -104,7 +104,7 @@ Required: `false`
 
 The `node`'s parent, if known.
 
-> **Note:** You will likely never need to define this!<br>In fact, `astray.walk` is recursive and sets/tracks this value as part of each node's [Path](#path-context) context.
+> **Note:** You will likely never need to define this!<br>In fact, `astray.walk` is recursive and sets/tracks this value as part of each node's [Path Context](#path-context).
 
 
 ### astray.lookup<T>(node: T, target?: string)
@@ -181,11 +181,11 @@ astray.walk(tree, {
 
 As you can see, the object-variant's `enter()` block is synonymous with the method-variant. (For simplicity, both formats will be referred to as the "enter" block.) However, an `exit` may only exist within the object-variant, forcing an existing method-variant to be converted into an `enter` key. When using the object-variant, the `enter` and `exit` keys are both optional – but at least one should exist, of course.
 
-Regardless of the visitor's format, every method has access to the _current_ `node` value as its first parameter. This is direct access to the tree's child, so any modification will mutate the value directly. Additionally, if you provided [`astray.walk()`](#TODO) with a [`state`](#state) value, that `state` is also passed to each visitor. This, too, allows you to directly mutate/modify your state object.
+Regardless of the visitor's format, every method has access to the _current_ `node` value as its first parameter. This is direct access to the tree's child, so any modification will mutate the value directly. Additionally, if you provided [`astray.walk()`](##astraywalkt-snode-t-visitor-visitors-state-s-parent-any) with a [`state`](#state) value, that `state` is also passed to each visitor. This, too, allows you to directly mutate/modify your state object.
 
-Anything that happens within the "enter" block happens _before_ the node's children are traversed. In other words, you _may_ alter the fate of this node's children. For example, returning the [`SKIP`](#TODO) or [`REMOVE`](#TODO) signals prevent your walker from ever seeing the children.
+Anything that happens within the "enter" block happens _before_ the node's children are traversed. In other words, you _may_ alter the fate of this node's children. For example, returning the [`SKIP`](#astrayskip) or [`REMOVE`](#astrayremove) signals prevent your walker from ever seeing the children.
 
-Anything that happens within the "exit" block happens _after_ the node's children have been traversed. For example, because `state` is shared, you can use this opportunity to collect any `state` values/flags that the children may have provided. Again, since child traversal has already happened, returning the [`SKIP`](#TODO) signal has no effect. Additionally, returning the [`REMOVE`](#TODO) signal still remove the `node` and its children, but still allows you to know what _was_ there.
+Anything that happens within the "exit" block happens _after_ the node's children have been traversed. For example, because `state` is shared, you can use this opportunity to collect any `state` values/flags that the children may have provided. Again, since child traversal has already happened, returning the [`SKIP`](#astrayskip) signal has no effect. Additionally, returning the [`REMOVE`](#astrayremove) signal still remove the `node` and its children, but still allows you to know what _was_ there.
 
 ## Path Context
 
@@ -203,7 +203,7 @@ When scaling a `node`'s ancestry (`astray.lookup`), additional keys are added to
 
 ## Scopes
 
-When using `astray.lookup()`, path contexts _may_ obtain scope/binding information.<br>These are records of what each parent container _provides_ (`node.path.scoped`) as well as what is _accessible_ (`node.path.bindings`) to this scope level. Additionally, if a node/parent's _entire_ ancestry has been recorded, then `node.path.scanned` will be true.
+When using [`astray.lookup()`](#astraylookupnode-t-target-string), path contexts _may_ obtain scope/binding information.<br>These are records of what each parent container _provides_ (`node.path.scoped`) as well as what is _accessible_ (`node.path.bindings`) to this scope level. Additionally, if a node/parent's _entire_ ancestry has been recorded, then `node.path.scanned` will be true.
 
 The records of bindings (including `astray.lookup`'s return value) are objects keyed by the identifier names. The keys' values are references to the node that included/defined that identifier. For example, this means that `VariableDeclarator`s will be returned instead of the `VariableDeclaration` that contained them. You may still access the `VariableDeclaration` via the `VariableDeclarator`s path context (`node.path.parent`).
 

@@ -29,7 +29,14 @@
     "*.d.ts",
     "dist"
   ],
-  "keywords": [],
+  "keywords": [
+    "ast",
+    "estree",
+    "traverse",
+    "walker",
+    "scope",
+    "walk"
+  ],
   "optionalDependencies": {
     "@types/estree": "^0.0.44"
   },
