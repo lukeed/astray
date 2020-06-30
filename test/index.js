@@ -4,13 +4,8 @@ import * as astray from '../src';
 
 const ENUM = suite('ENUM');
 
-ENUM('SKIP', () => {
-	assert.is(astray.SKIP, true);
-});
-
-ENUM('REMOVE', () => {
-	assert.is(astray.REMOVE, false);
-});
+ENUM('SKIP', () => assert.is(astray.SKIP, true));
+ENUM('REMOVE', () => assert.is(astray.REMOVE, false));
 
 ENUM.run();
 
