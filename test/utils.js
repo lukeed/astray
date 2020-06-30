@@ -323,9 +323,41 @@ toNode('FunctionDeclaration', () => {
 	isNode(utils.toNode(foo), 'FunctionDeclaration');
 });
 
+toNode('ImportSpecifier', () => {
+	const item = { type: 'ImportSpecifier' };
+	assert.equal(utils.toNode(item), item);
+});
+
+toNode('ImportDefaultSpecifier', () => {
+	const item = { type: 'ImportDefaultSpecifier' };
+	assert.equal(utils.toNode(item), item);
+});
+
+toNode('ImportNamespaceSpecifier', () => {
+	const item = { type: 'ImportNamespaceSpecifier' };
+	assert.equal(utils.toNode(item), item);
+});
+
+toNode('FunctionDeclaration', () => {
+	const item = { type: 'FunctionDeclaration' };
+	assert.equal(utils.toNode(item), item);
+});
+
+toNode('VariableDeclarator', () => {
+	const item = { type: 'VariableDeclarator' };
+	assert.equal(utils.toNode(item), item);
+});
+
 toNode('Unknown', () => {
-	const node = { type: 'foo', value: 'bar' };
-	assert.is(utils.toNode(node), undefined);
+	const item = { type: 'foo', value: 'bar' };
+	assert.is(utils.toNode(item), undefined);
+});
+
+toNode('empty', () => {
+	assert.is(utils.toNode(0), 0);
+	assert.is(utils.toNode(false), false);
+	assert.is(utils.toNode(undefined), undefined);
+	assert.is(utils.toNode(null), null);
 });
 
 toNode.run();
