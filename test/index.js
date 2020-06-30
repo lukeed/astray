@@ -638,11 +638,11 @@ lookup('should return all bindings input Node', () => {
 	);
 
 	assert.is(output.say.type, 'FunctionDeclaration');
-	assert.is(output.greet.type, 'VariableDeclarator'); // TODO: inconsistent V/ion|or
-	assert.is(output.foobar.type, 'VariableDeclarator'); // TODO: inconsistent V/ion|or
+	assert.is(output.greet.type, 'VariableDeclarator');
+	assert.is(output.foobar.type, 'VariableDeclarator');
 	assert.is(output.Hello.type, 'FunctionDeclaration');
-	assert.is(output.props.type, 'Identifier'); // TODO: link function?
-	assert.is(output.API.type, 'VariableDeclaration'); // TODO: inconsistent V/ion|or
+	assert.is(output.props.type, 'Identifier');
+	assert.is(output.API.type, 'VariableDeclarator');
 });
 
 lookup('should introduce sibling scopes', () => {
@@ -669,10 +669,10 @@ lookup('should introduce sibling scopes', () => {
 
 	assert.is(output.foo.type, output.bar.type);
 	assert.is(output.bar.type, 'VariableDeclarator');
-	assert.is(output.hello.type, 'VariableDeclarator'); // TODO: inconsistent V/ion|or
+	assert.is(output.hello.type, 'VariableDeclarator');
 	assert.is(output.init.type, 'FunctionDeclaration');
 	assert.is(output.Hello.type, 'FunctionDeclaration');
-	assert.is(output.props.type, 'Identifier'); // TODO: link func?
+	assert.is(output.props.type, 'Identifier');
 });
 
 lookup('should fill ancestry with bindings caches', () => {

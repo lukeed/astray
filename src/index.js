@@ -1,4 +1,4 @@
-import { toIdentifier } from './utils';
+import { toIdentifier, toNode } from './utils';
 
 export const SKIP = true;
 // export const BREAK = false;
@@ -92,9 +92,7 @@ export function lookup(baseNode, target) {
 	output = (output.bindings = output.bindings || {});
 
 	while (parent = parent.path.parent) {
-		// TODO: incomplete parent.type list ?
 		let dict = parent.path.bindings || parent.path.scoped;
-		// console.log('~> parent.type', parent.type, dict);
 
 		if (dict === void 0) {
 			dict = {}; // WIP scoped
@@ -118,25 +116,21 @@ export function lookup(baseNode, target) {
 				}
 			} else if (parent.type === 'FunctionDeclaration') {
 				let tmp = toIdentifier(parent);
-				// if (tmp && !dict[tmp]) dict[tmp] = parent;
 				if (tmp) dict[tmp] = dict[tmp] || parent;
 
 				// TODO: point to parent ref?
 				parent.params.forEach(obj => {
 					if (tmp = toIdentifier(obj)) {
-						// if (!dict[tmp]) dict[tmp] = obj;
 						dict[tmp] = dict[tmp] || obj;
 					}
 				});
 			} else if (parent.type === 'Program') {
-				let i=0, tmp, arr=parent.body;
+				let i=0, tmp, xyz, arr=parent.body;
 				for (; i < arr.length; i++) {
-					if (tmp = toIdentifier(arr[i])) {
-						// TODO: no concat
-						[].concat(tmp).forEach(str => {
-							// if (output[str]) return;
-							// output[str] = arr[i];
-							dict[str] = dict[str] || arr[i];
+					if (xyz = toNode(arr[i])) {
+						[].concat(xyz).forEach(node => {
+							tmp = toIdentifier(node);
+							dict[tmp] = dict[tmp] || node;
 						});
 					}
 				}
