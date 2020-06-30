@@ -272,7 +272,7 @@ astray:             0.544ms
 
 ***Walking***
 
-All candidates traverse the preparsed AST (ESTree format) of `d3.min.js`. Each candidate must count the `Identifier` nodes seen as a validation step.
+All candidates traverse the preparsed AST (ESTree format) of `d3.min.js`.<br>Each candidate must count the `Identifier` nodes seen as a validation step.
 
 ```
 Validation:
