@@ -23,6 +23,14 @@ console.time('astray');
 const astray = require('astray');
 console.timeEnd('astray');
 
+const FIXTURES = {
+	'@babel/traverse': './fixtures/babel.json',
+	'estree-walker': './fixtures/estree.json',
+	'acorn-walk': './fixtures/acorn.json',
+	'ast-types': './fixtures/estree.json',
+	'astray': './fixtures/estree.json',
+}
+
 const walkers = {
 	'@babel/traverse': (tree) => {
 		let count = 0;
@@ -81,7 +89,7 @@ const walkers = {
 
 console.log('\nValidation: ');
 Object.keys(walkers).forEach(name => {
-	const INPUT = require('./fixture.json');
+	const INPUT = require(FIXTURES[name]);
 	const idents = walkers[name](INPUT);
 
 	try {
@@ -98,7 +106,7 @@ const bench = new Suite().on('cycle', e => {
 });
 
 Object.keys(walkers).forEach(name => {
-	const INPUT = require('./fixture.json');
+	const INPUT = require(FIXTURES[name]);
 	bench.add(name + ' '.repeat(18 - name.length), () => {
 		walkers[name](INPUT);
 	})

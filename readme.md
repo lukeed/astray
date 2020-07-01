@@ -274,25 +274,27 @@ astray:             0.544ms
 
 ***Walking***
 
-All candidates traverse the pre-parsed AST (ESTree format) of `d3.min.js`. <br>Each candidate must count the `Identifier` nodes seen as a validation step.
+All candidates traverse the pre-parsed AST (ESTree format, unless noted otherwise) of `d3.min.js`. <br>Each candidate must count the `Identifier` nodes seen as a validation step.
 
 ```
 Validation:
-  ✘ @babel/traverse  (33,331 identifiers)
-  ✔ estree-walker    (41,669 identifiers)
-  ✘ acorn-walk       (23,340 identifiers)
-  ✔ ast-types        (41,669 identifiers)
-  ✔ astray           (41,669 identifiers)
+  ✔ @babel/traverse ≠   (41,669 identifiers)
+  ✔ estree-walker       (41,669 identifiers)
+  ✘ acorn-walk †        (23,340 identifiers)
+  ✔ ast-types           (41,669 identifiers)
+  ✔ astray              (41,669 identifiers)
 
 Benchmark:
-  @babel/traverse    x  17.36 ops/sec ±3.33% (47 runs sampled)
-  estree-walker      x 122.31 ops/sec ±0.52% (78 runs sampled)
-  acorn-walk         x 106.12 ops/sec ±0.38% (77 runs sampled)
-  ast-types          x   5.20 ops/sec ±7.53% (17 runs sampled)
-  astray             x 144.37 ops/sec ±0.56% (80 runs sampled)
+  @babel/traverse ≠  x  12.25 ops/sec ± 5.46% (35 runs sampled)
+  estree-walker      x 120.87 ops/sec ± 0.86% (79 runs sampled)
+  acorn-walk †       x  81.49 ops/sec ± 0.76% (70 runs sampled)
+  ast-types          x   4.77 ops/sec ±12.35% (16 runs sampled)
+  astray             x 144.27 ops/sec ± 0.89% (81 runs sampled)
 ```
 
-> **Note:**<br>I've not (yet) investigated as to _why_ `@babel/traverse` and `acorn-walk` counts are incorrect – but they are.<br>All methods exported by `acorn-walk` (simple, full, recursive) have been tried and return the same value.<br>Run `$ cat bench/fixture.json | grep "Identifier" | wc -l` to verify the `41,669` figure.
+> **Note:**<br> Run `cat bench/fixtures/estree.json | grep "Identifier" | wc -l` to verify the `41,669` figure.<br>
+> <sup>`≠`</sup> Babel does not follow the ESTree format. Instead, `@babel/parser` must be used in order for validation to pass.<br>
+> <sup>`†`</sup> Acorn _does_ follow the ESTree format, but `acorn-walk` fails to count all identifiers. All exported methods (simple, full, recursive) returned the same value. Results are taken using an `acorn` AST, although it fails using while traversing the ESTree fixture (`estree.json`).
 
 ## License
 
