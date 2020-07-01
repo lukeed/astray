@@ -292,9 +292,10 @@ Benchmark:
   astray             x 144.27 ops/sec ± 0.89% (81 runs sampled)
 ```
 
-> **Note:**<br> Run `cat bench/fixtures/estree.json | grep "Identifier" | wc -l` to verify the `41,669` figure.<br>
-> <sup>`≠`</sup> Babel does not follow the ESTree format. Instead, `@babel/parser` must be used in order for validation to pass.<br>
-> <sup>`†`</sup> Acorn _does_ follow the ESTree format, but `acorn-walk` fails to count all identifiers. All exported methods (simple, full, recursive) returned the same value. Results are taken using an `acorn` AST, although it fails using while traversing the ESTree fixture (`estree.json`).
+> **Notice:**<br><br>
+> Run `$ cat bench/fixtures/estree.json | grep "Identifier" | wc -l` to verify the `41,669` figure.<br><br>
+> <sup>`≠`</sup> Babel does not follow the ESTree format. Instead `@babel/traverse` requires that `@babel/parser` be used in order for validation to pass.<br><br>
+> <sup>`†`</sup> Acorn _does_ follow the ESTree format, but `acorn-walk` still fails to count all identifiers. All exported methods (simple, full, recursive) returned the same value. Results are taken using an `acorn` AST, although it fails using while traversing the ESTree fixture (`estree.json`).
 
 ## License
 
