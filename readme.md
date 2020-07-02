@@ -115,7 +115,7 @@ Find all [bindings](#scopes) that are accessible to this `node` by scaling its a
 
 While doing so, each _parent_ context container (eg, `BlockStatement`, `FunctionDeclaration`, or `Program`) is assigned its own cache of available bindings. See [Path Context](#path-context) for more.
 
-A dictionary of scopes are returned for the `node`. This will be an object whose keys are the identifer names and whose values are references to the nodes that the identifer points to.
+A dictionary of scopes are returned for the `node`. This will be an object whose keys are the identifier names and whose values are references to the nodes that the identifier points to.
 
 > **Note:** The return object will always include the `node` itself.
 
@@ -128,7 +128,7 @@ The starting point &mdash; the node that's interested in learning what's availab
 Type: `string`<br>
 Required: `false`
 
-An optional target value that, if found, will immediately exit the ancestral lookup.<br>This should be the name of an identifer that your `node` is interested in, or the name of a parent container that you don't wish to exit.
+An optional target value that, if found, will immediately exit the ancestral lookup.<br>This should be the name of an identifier that your `node` is interested in, or the name of a parent container that you don't wish to exit.
 
 
 ### astray.SKIP
