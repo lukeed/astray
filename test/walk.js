@@ -474,36 +474,6 @@ replace('should replace Node w/ new content :: exit', () => {
 	assert.ok(updated);
 });
 
-replace.skip('should remove Node w/ falsey content', () => {
-	const program = parse(`
-		var a=1, b=2, c=3, d=4;
-	`);
-
-	let count = 0
-	astray.walk(program, {
-		Identifier(node) {
-			count++;
-			switch (node.name) {
-				case 'a': node.path.replace(null);
-				case 'b': node.path.replace(undefined);
-				case 'c': node.path.replace(false);
-				case 'd': node.path.replace(0);
-			}
-		},
-	});
-
-	assert.is(count, 4);
-
-	let check = 0;
-	astray.walk(program, {
-		Identifier() {
-			check++;
-		},
-	});
-
-	assert.is(check, 0);
-});
-
 replace('should replace Node before child traversal :: block', () => {
 	const program = parse(`
 		var foo = 123;
