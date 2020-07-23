@@ -38,14 +38,14 @@
     "walk"
   ],
   "optionalDependencies": {
-    "@types/estree": "^0.0.44"
+    "@types/estree": "^0.0.45"
   },
   "devDependencies": {
-    "@types/estree": "^0.0.44",
+    "@types/estree": "^0.0.45",
     "bundt": "1.0.1",
     "esm": "3.2.25",
     "klona": "1.1.1",
     "meriyah": "1.9.15",
-    "uvu": "0.0.17"
+    "uvu": "0.3.0"
   }
 }
