@@ -69,7 +69,7 @@ for (let key in bindings) {
 
 ## API
 
-### astray.walk<T, S>(node: T, visitor: Visitor\<S>, state?: S, parent?: any)
+### astray.walk<T, S, M>(node: T, visitor: Visitor\<S, M>, state?: S, parent?: any)
 Type: `Function`<br>
 Returns: `Path<T>` or `T` or `undefined`
 
@@ -107,7 +107,7 @@ The `node`'s parent, if known.
 > **Note:** You will likely never need to define this!<br>In fact, `astray.walk` is recursive and sets/tracks this value as part of each node's [Path Context](#path-context).
 
 
-### astray.lookup<T>(node: T, target?: string)
+### astray.lookup<M, T>(node: T, target?: string)
 Type: `Function`<br>
 Returns: `Record<string, any>`
 
