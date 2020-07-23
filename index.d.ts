@@ -26,14 +26,14 @@ export const REMOVE: boolean;
 export function walk<T, S = Fallback>(node: T, visitor: Visitor<S>, state?: S, parent?: ESTree.Node): Path<T>;
 export function lookup<T = ESTree.Node>(node: T, target?: string): Record<string, ESTree.Node>;
 
-export namespace ESTree {
-	export type Node = AST.Node;
-
-	export interface Nodes {
+export interface ESTreeMap {
+	Node: AST.Node;
 		Comment: AST.Comment;
 		Position: AST.Position;
 		Program: AST.Program;
 		Directive: AST.Directive;
+	Function: AST.Function;
+	Statement: AST.Statement;
 		EmptyStatement: AST.EmptyStatement;
 		BlockStatement: AST.BlockStatement;
 		ExpressionStatement: AST.ExpressionStatement;
@@ -51,10 +51,14 @@ export namespace ESTree {
 		ForStatement: AST.ForStatement;
 		ForInStatement: AST.ForInStatement;
 		DebuggerStatement: AST.DebuggerStatement;
+	Declaration: AST.Declaration;
 		FunctionDeclaration: AST.FunctionDeclaration;
 		VariableDeclaration: AST.VariableDeclaration;
 		VariableDeclarator: AST.VariableDeclarator;
+	Expression: AST.Expression;
 		BaseExpression: AST.BaseExpression;
+	ChainElement: AST.ChainElement;
+	ChainExpression: AST.ChainExpression;
 		ThisExpression: AST.ThisExpression;
 		ArrayExpression: AST.ArrayExpression;
 		ObjectExpression: AST.ObjectExpression;
@@ -67,14 +71,24 @@ export namespace ESTree {
 		UpdateExpression: AST.UpdateExpression;
 		LogicalExpression: AST.LogicalExpression;
 		ConditionalExpression: AST.ConditionalExpression;
+	BaseCallExpression: AST.BaseCallExpression;
+	CallExpression: AST.CallExpression;
 		SimpleCallExpression: AST.SimpleCallExpression;
 		NewExpression: AST.NewExpression;
 		MemberExpression: AST.MemberExpression;
+	Pattern: AST.Pattern;
+	BasePattern: AST.BasePattern;
 		SwitchCase: AST.SwitchCase;
 		CatchClause: AST.CatchClause;
 		Identifier: AST.Identifier;
+	Literal: AST.Literal;
 		SimpleLiteral: AST.SimpleLiteral;
 		RegExpLiteral: AST.RegExpLiteral;
+	UnaryOperator: AST.UnaryOperator;
+	BinaryOperator: AST.BinaryOperator;
+	LogicalOperator: AST.LogicalOperator;
+	AssignmentOperator: AST.AssignmentOperator;
+	UpdateOperator: AST.UpdateOperator;
 		ForOfStatement: AST.ForOfStatement;
 		Super: AST.Super;
 		SpreadElement: AST.SpreadElement;
@@ -88,11 +102,17 @@ export namespace ESTree {
 		ArrayPattern: AST.ArrayPattern;
 		RestElement: AST.RestElement;
 		AssignmentPattern: AST.AssignmentPattern;
+	Class: AST.Class;
+	BaseClass: AST.BaseClass;
 		ClassBody: AST.ClassBody;
 		MethodDefinition: AST.MethodDefinition;
 		ClassDeclaration: AST.ClassDeclaration;
 		ClassExpression: AST.ClassExpression;
 		MetaProperty: AST.MetaProperty;
+	ModuleDeclaration: AST.ModuleDeclaration;
+	BaseModuleDeclaration: AST.BaseModuleDeclaration;
+	ModuleSpecifier: AST.ModuleSpecifier;
+	BaseModuleSpecifier: AST.BaseModuleSpecifier;
 		ImportDeclaration: AST.ImportDeclaration;
 		ImportSpecifier: AST.ImportSpecifier;
 		ImportExpression: AST.ImportExpression;
@@ -103,12 +123,4 @@ export namespace ESTree {
 		ExportDefaultDeclaration: AST.ExportDefaultDeclaration;
 		ExportAllDeclaration: AST.ExportAllDeclaration;
 		AwaitExpression: AST.AwaitExpression;
-		CallExpression: AST.CallExpression;
-		UnaryOperator: AST.UnaryOperator;
-		BinaryOperator: AST.BinaryOperator;
-		LogicalOperator: AST.LogicalOperator;
-		AssignmentOperator: AST.AssignmentOperator;
-		UpdateOperator: AST.UpdateOperator;
-		Literal: AST.Literal;
-	}
 }
