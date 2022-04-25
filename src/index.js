@@ -2,6 +2,7 @@ import { toIdentifier, toNode } from './utils';
 
 export const SKIP = true;
 export const REMOVE = false;
+export const ANY = '*';
 
 export function walk(node, visitor, state, parent) {
 	if (!node) return;
@@ -24,7 +25,7 @@ export function walk(node, visitor, state, parent) {
 	if (!type) return node;
 
 	let key, item, xyz;
-	let block = visitor[type];
+	let block = visitor[type] || visitor[ANY];
 
 	if (node.path === void 0) {
 		node.path = { parent };
