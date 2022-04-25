@@ -6,6 +6,7 @@ const ENUM = suite('ENUM');
 
 ENUM('SKIP', () => assert.is(astray.SKIP, true));
 ENUM('REMOVE', () => assert.is(astray.REMOVE, false));
+ENUM('ANY', () => assert.is(astray.ANY, '*'));
 
 ENUM.run();
 
