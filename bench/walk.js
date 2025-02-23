@@ -3,25 +3,25 @@ const { Suite } = require('benchmark');
 
 console.log('\Load times: ');
 
-console.time('@babel/traverse');
+console.time('  @babel/traverse');
 const babel = require('@babel/traverse').default;
-console.timeEnd('@babel/traverse');
+console.timeEnd('  @babel/traverse');
 
-console.time('estree-walker');
+console.time('  estree-walker');
 const estree = require('estree-walker');
-console.timeEnd('estree-walker');
+console.timeEnd('  estree-walker');
 
-console.time('acorn-walk');
+console.time('  acorn-walk');
 const acorn = require('acorn-walk');
-console.timeEnd('acorn-walk');
+console.timeEnd('  acorn-walk');
 
-console.time('ast-types');
+console.time('  ast-types');
 const asttypes = require('ast-types');
-console.timeEnd('ast-types');
+console.timeEnd('  ast-types');
 
-console.time('astray');
+console.time('  astray');
 const astray = require('astray');
-console.timeEnd('astray');
+console.timeEnd('  astray');
 
 const FIXTURES = {
 	'@babel/traverse': './fixtures/babel.json',

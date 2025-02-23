@@ -258,18 +258,18 @@ for (let key in bindings) {
 
 ## Benchmarks
 
-> Running on Node.js v10.13.1
+> Running on Bun 1.2.3
 
 ***Load Time***
 
 How long does it take to `require` the dependency?
 
 ```
-@babel/traverse:  174.038ms
-estree-walker:      0.711ms
-acorn-walk:         1.329ms
-ast-types:         31.591ms
-astray:             0.544ms
+@babel/traverse:   52.72ms
+estree-walker:      0.66ms
+acorn-walk:         0.75ms
+ast-types:         12.08ms
+astray:             0.37ms
 ```
 
 ***Walking***
@@ -285,11 +285,11 @@ Validation:
   ✔ astray              (41,669 identifiers)
 
 Benchmark:
-  @babel/traverse ≠  x  12.25 ops/sec ± 5.46% (35 runs sampled)
-  estree-walker      x 120.87 ops/sec ± 0.86% (79 runs sampled)
-  acorn-walk †       x  81.49 ops/sec ± 0.76% (70 runs sampled)
-  ast-types          x   4.77 ops/sec ±12.35% (16 runs sampled)
-  astray             x 144.27 ops/sec ± 0.89% (81 runs sampled)
+  @babel/traverse    x  38 ops/sec ±1.65% (52 runs sampled)
+  estree-walker      x 248 ops/sec ±0.12% (92 runs sampled)
+  acorn-walk †       x 172 ops/sec ±0.05% (89 runs sampled)
+  ast-types          x  16 ops/sec ±1.62% (46 runs sampled)
+  astray             x 301 ops/sec ±0.14% (92 runs sampled)
 ```
 
 > **Notice:**<br><br>

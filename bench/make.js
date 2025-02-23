@@ -14,7 +14,7 @@ fs.writeFileSync(
 
 fs.writeFileSync(
 	path.join(__dirname, 'fixtures', 'acorn.json'),
-	JSON.stringify(acorn.parse(source), null, 2),
+	JSON.stringify(acorn.parse(source, { ecmaVersion: 2020 }), null, 2),
 );
 
 fs.writeFileSync(
