@@ -147,6 +147,25 @@ Any [Visitor](#visitors) may return this value to remove this node from the tree
 > **Important:** When the visitor's `exit()` block returns `REMOVE`, the node's children have already been walked.<br>Otherwise, returning `REMOVE` from `enter()` or the named/base block will skip children traversal.
 
 
+### astray.ANY
+Type: `String`
+
+The name for a [Visitor](#visitors) matching any node type, shich will be called as a fallback, if there is no concrete visitor for a particular node type. The value is an asterisk (`*`).
+
+> **Important:** Remember to enclose this identifier in brackets, so that it is evaluated as a method name:
+
+```js
+astray.walk(AST, {
+  Identifier(node, state) {
+    ...
+  },
+  [ANY](node, state) {
+    ...
+  }
+}, STATE);
+```
+
+
 ## Visitors
 
 A "visitor" is a definition of behaviors/actions that should be invoked when a matching node's `type` is found.
@@ -188,6 +207,28 @@ Regardless of the visitor's format, every method has access to the _current_ `no
 Anything that happens within the "enter" block happens _before_ the node's children are traversed. In other words, you _may_ alter the fate of this node's children. For example, returning the [`SKIP`](#astrayskip) or [`REMOVE`](#astrayremove) signals prevent your walker from ever seeing the children.
 
 Anything that happens within the "exit" block happens _after_ the node's children have been traversed. For example, because `state` is shared, you can use this opportunity to collect any `state` values/flags that the children may have provided. Again, since child traversal has already happened, returning the [`SKIP`](#astrayskip) signal has no effect. Additionally, returning the [`REMOVE`](#astrayremove) signal still remove the `node` and its children, but still allows you to know what _was_ there.
+
+
+### Wildcard
+
+If you want to write a visitor handling _any_ node type, you can add it with the key [`ANY`](#astrayany), which is an alias for the string `*` (asterisk). It will be processed as a fallback - if there is no visitor for the type of the currently processed node, this wildcard visitor will be called.
+
+For example, using the wildcard visitor to stop walking after a particular node has been reached:
+
+```js
+let STATE = { ids: new Set, stopNode: ... };
+
+// Walk AST and collect identifiers
+astray.walk(AST, {
+  Identifier(node, state) {
+    state.ids.add(node.name);
+  },
+  [astray.ANY](node, state) {
+    if (node === state.stopNode) return astray.SKIP;
+  }
+}, STATE);
+```
+
 
 ## Path Context
 

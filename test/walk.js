@@ -93,6 +93,24 @@ walk('should update Node item after visitor mutations', () => {
 	assert.not.equal(program, copy);
 });
 
+walk('should call a wildcard visitor', () => {
+	let concrete = false;
+	let wildcard = false;
+	const program = parse(`var hello = 'world';`);
+	astray.walk(program, {
+		Program(node) {
+			assert.ok(node === program);
+			concrete = true;
+		},
+		[astray.ANY](node) {
+			assert.ok(node !== program);
+			wildcard = true;
+		}
+	});
+	assert.ok(concrete, '~> concrete visitor');
+	assert.ok(wildcard, '~> wildcard visitor');
+});
+
 walk.run();
 
 // ---
